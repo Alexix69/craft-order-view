@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="generator" content="CraftOrderView"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <title>Classic Mueblería — Acceso</title>
+    <link th:href="@{/assets/css/font-face.css}" rel="stylesheet" media="all"/>
+    <link th:href="@{/assets/vendor/fontawesome-7.2.0/css/all.min.css}" rel="stylesheet" media="all"/>
+    <link th:href="@{/assets/vendor/bootstrap-5.3.8.min.css}" rel="stylesheet" media="all"/>
+    <link th:href="@{/assets/vendor/css-hamburgers/hamburgers.min.css}" rel="stylesheet" media="all"/>
+    <link th:href="@{/assets/css/theme.css}" rel="stylesheet" media="all"/>
+    <link th:href="@{/assets/css/theme-2026.css}" rel="stylesheet" media="all"/>
+</head>
+
+<body class="theme-2026 auth-page">
+<a class="visually-hidden-focusable skip-link" href="#auth-form">Skip to sign-in form</a>
+<main class="login-wrap" id="auth-form">
+    <div class="login-content">
+        <a th:href="@{/}" class="auth-brand" aria-label="CraftOrderView home">
+            <span class="logo-mark" aria-hidden="true">C</span>
+            <span class="logo-text">CraftOrderView</span>
+        </a>
+        <h1 class="auth-title">Classic Mueblería — Acceso</h1>
+        <p class="auth-subtitle">Ingresa tus credenciales para continuar.</p>
+
+        <form class="login-form" th:action="@{/login}" method="post">
+            <p th:if="${error}" th:text="${error}" class="text-danger"></p>
+            <div class="form-group">
+                <label for="correo">Correo electrónico</label>
+                <input id="correo" class="au-input" type="email" name="correo"
+                       placeholder="tucorreo@ejemplo.com" autocomplete="email" required/>
+            </div>
+            <div class="form-group">
+                <label for="contrasena">Contraseña</label>
+                <input id="contrasena" class="au-input" type="password" name="contrasena"
+                       placeholder="••••••••" autocomplete="current-password" required/>
+            </div>
+            <button class="au-btn au-btn--green" type="submit">Ingresar</button>
+        </form>
+    </div>
+</main>
+<script th:src="@{/assets/vendor/bootstrap-5.3.8.bundle.min.js}"></script>
+<script th:src="@{/assets/js/vanilla-utils.js}"></script>
+<script th:src="@{/assets/js/bootstrap5-init.js}"></script>
+<script th:src="@{/assets/js/main-vanilla.js}"></script>
+<script th:src="@{/assets/js/modern-plugins.js}"></script>
+</body>
+</html>
