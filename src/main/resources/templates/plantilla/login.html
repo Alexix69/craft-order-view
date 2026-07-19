@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceso | Classic Mueblería</title>
+  <link th:href="@{/assets/vendor/bootstrap-5.3.8.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/fontawesome-7.2.0/css/all.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/craftorder.css}" rel="stylesheet">
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100"
+      style="background:var(--co-sidebar-bg)">
+
+  <div class="card shadow-sm" style="width:100%;max-width:400px;
+       background:var(--co-bg-card);border:1px solid var(--co-border);
+       border-radius:12px">
+    <div class="card-body p-4">
+
+      <div class="text-center mb-4">
+        <i class="fa-solid fa-hammer fa-2x mb-2"
+           style="color:var(--co-primary)"></i>
+        <h1 class="h5 fw-bold mb-0"
+            style="color:var(--co-text-primary)">Classic Mueblería</h1>
+        <p class="small mt-1"
+           style="color:var(--co-text-secondary)">Panel de gestión</p>
+      </div>
+
+      <div th:if="${error}" class="alert alert-danger py-2 small" th:text="${error}"></div>
+
+      <form th:action="@{/login}" method="post">
+        <div class="mb-3">
+          <label for="correo" class="form-label">Correo</label>
+          <input type="email" class="form-control" id="correo"
+                 name="correo" required autofocus>
+        </div>
+        <div class="mb-3">
+          <label for="contrasena" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="contrasena"
+                 name="contrasena" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-2">
+          Ingresar
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <script th:src="@{/assets/vendor/bootstrap-5.3.8.bundle.min.js}"></script>
+  <script th:src="@{/assets/js/craftorder.js}"></script>
+</body>
+</html>

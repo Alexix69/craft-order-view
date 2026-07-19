@@ -1,0 +1,107 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-admin}">
+
+<div layout:fragment="contenido">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 fw-bold mb-0"
+        style="color:var(--co-text-primary)">Gestión de Usuarios</h1>
+    <button type="button" class="btn btn-primary"
+            data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
+      <i class="fa-solid fa-plus me-1"></i>
+      Nuevo Usuario
+    </button>
+  </div>
+
+  <div th:if="${errorConexion}"
+       class="alert alert-warning"
+       th:text="${errorConexion}"></div>
+
+  <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr style="border-bottom:2px solid var(--co-border)">
+            <th style="color:var(--co-text-secondary)">Nombre</th>
+            <th style="color:var(--co-text-secondary)">Correo</th>
+            <th style="color:var(--co-text-secondary)">Rol</th>
+            <th style="color:var(--co-text-secondary)">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(usuarios)}">
+            <td colspan="4" class="text-center py-4"
+                style="color:var(--co-text-muted)">
+              No hay usuarios registrados.
+            </td>
+          </tr>
+          <tr th:each="usuario : ${usuarios}">
+            <td th:text="${usuario.nombre}"
+                style="color:var(--co-text-primary)"></td>
+            <td th:text="${usuario.correo}"
+                style="color:var(--co-text-secondary)"></td>
+            <td th:text="${usuario.rol}"
+                style="color:var(--co-text-secondary)"></td>
+            <td>
+              <form th:action="@{/admin/artesanos/{id}/desactivar(id=${usuario.id})}"
+                    method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-danger"
+                        onclick="return confirm('¿Desactivar este usuario?')">
+                  Desactivar
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de creación -->
+  <div class="modal fade" id="modalCrearUsuario" tabindex="-1"
+       aria-labelledby="modalCrearUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCrearUsuarioLabel">Nuevo Usuario</h5>
+          <button type="button" class="btn-close"
+                  data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form th:action="@{/admin/artesanos}" method="post">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre"
+                     name="nombre" required>
+            </div>
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo</label>
+              <input type="email" class="form-control" id="correo"
+                     name="correo" required>
+            </div>
+            <div class="mb-3">
+              <label for="contrasena" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="contrasena"
+                     name="contrasena" required>
+            </div>
+            <div class="mb-3">
+              <label for="rol" class="form-label">Rol</label>
+              <select class="form-select" id="rol" name="rol">
+                <option value="ARTESANO">Artesano</option>
+                <option value="ADMIN">Administrador</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+</html>
