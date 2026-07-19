@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="es">
+<head th:fragment="head">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${tituloPagina != null ? tituloPagina + ' | Classic Mueblería' :
+                   'Classic Mueblería'}">Classic Mueblería</title>
+  <link th:href="@{/assets/vendor/bootstrap-5.3.8.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/fontawesome-7.2.0/css/all.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/craftorder.css}" rel="stylesheet">
+</head>
+<body style="background:var(--co-bg-page)">
+
+  <nav class="navbar px-4 py-3"
+       style="background:var(--co-sidebar-bg)">
+    <a class="navbar-brand fw-bold"
+       th:href="@{/catalogo}"
+       style="color:var(--co-sidebar-active-text)">
+      <i class="fa-solid fa-hammer me-2"
+         style="color:var(--co-primary-light)"></i>
+      Classic Mueblería
+    </a>
+  </nav>
+
+  <main class="container py-4">
+    <div layout:fragment="contenido">
+      <!-- contenido de la vista hija -->
+    </div>
+  </main>
+
+  <script th:src="@{/assets/vendor/bootstrap-5.3.8.bundle.min.js}"></script>
+  <script th:src="@{/assets/js/craftorder.js}"></script>
+
+</body>
+</html>
