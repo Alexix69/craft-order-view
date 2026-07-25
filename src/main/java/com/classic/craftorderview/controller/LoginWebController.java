@@ -1,8 +1,8 @@
 package com.classic.craftorderview.controller;
 
 import com.classic.craftorderview.model.dto.request.LoginRequestDTO;
-import com.classic.craftorderview.model.dto.response.UsuarioResponseDTO;
-import com.classic.craftorderview.services.UsuarioApiService;
+import com.classic.craftorderview.model.dto.response.UsuarioResponseDto;
+import com.classic.craftorderview.services.IUsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class LoginWebController {
 
-    private final UsuarioApiService usuarioService;
+    private final IUsuarioService usuarioService;
 
-    public LoginWebController(UsuarioApiService usuarioService) {
+    public LoginWebController(IUsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
@@ -30,7 +30,7 @@ public class LoginWebController {
                                 HttpSession session,
                                 Model model) {
         try {
-            UsuarioResponseDTO usuario = usuarioService.autenticar(dto);
+            UsuarioResponseDto usuario = usuarioService.autenticar(dto);
             session.setAttribute("usuarioId", usuario.getId());
             session.setAttribute("usuarioNombre", usuario.getNombre());
             session.setAttribute("usuarioRol", usuario.getRol());
