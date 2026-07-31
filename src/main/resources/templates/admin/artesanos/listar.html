@@ -1,56 +1,64 @@
-<html xmlns:th="http://www.thymeleaf.org"
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{plantilla/base-admin}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
 
-<div layout:fragment="contenido">
+<div layout:fragment="contenidopaginas">
 
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h4 fw-bold mb-0"
-        style="color:var(--co-text-primary)">Gestión de Usuarios</h1>
+    <h1 class="h4 fw-bold mb-0">Gestión de Artesanos</h1>
     <button type="button" class="btn btn-primary"
-            data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
-      <i class="fa-solid fa-plus me-1"></i>
-      Nuevo Usuario
+            data-bs-toggle="modal" data-bs-target="#modalNuevo">
+      <i class="bi bi-plus-lg me-1"></i>Nuevo Artesano
     </button>
   </div>
 
-  <div th:if="${errorConexion}"
-       class="alert alert-warning"
-       th:text="${errorConexion}"></div>
+  <div th:if="${errorArtesano}" class="alert alert-danger" th:text="${errorArtesano}"></div>
 
-  <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
+  <div class="card">
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
+      <table class="table table-hover align-middle mb-0">
         <thead>
-          <tr style="border-bottom:2px solid var(--co-border)">
-            <th style="color:var(--co-text-secondary)">Nombre</th>
-            <th style="color:var(--co-text-secondary)">Correo</th>
-            <th style="color:var(--co-text-secondary)">Rol</th>
-            <th style="color:var(--co-text-secondary)">Acciones</th>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr th:if="${#lists.isEmpty(usuarios)}">
-            <td colspan="4" class="text-center py-4"
-                style="color:var(--co-text-muted)">
-              No hay usuarios registrados.
+          <tr th:if="${#lists.isEmpty(artesanos)}">
+            <td colspan="5" class="text-center py-4 text-muted">
+              No hay artesanos registrados.
             </td>
           </tr>
-          <tr th:each="usuario : ${usuarios}">
-            <td th:text="${usuario.nombre}"
-                style="color:var(--co-text-primary)"></td>
-            <td th:text="${usuario.correo}"
-                style="color:var(--co-text-secondary)"></td>
-            <td th:text="${usuario.rol}"
-                style="color:var(--co-text-secondary)"></td>
+          <tr th:each="artesano : ${artesanos}">
+            <td th:text="${artesano.nombre}">Nombre</td>
+            <td th:text="${artesano.correo}">correo@ejemplo.com</td>
+            <td th:text="${artesano.rol}">ARTESANO</td>
             <td>
-              <form th:action="@{/admin/artesanos/{id}/desactivar(id=${usuario.id})}"
-                    method="post" class="d-inline">
-                <button type="submit" class="btn btn-sm btn-danger"
-                        onclick="return confirm('¿Desactivar este usuario?')">
-                  Desactivar
-                </button>
-              </form>
+              <span th:if="${artesano.activo}" class="badge bg-success">Activo</span>
+              <span th:unless="${artesano.activo}" class="badge bg-danger">Inactivo</span>
+            </td>
+            <td class="text-end">
+              <button th:if="${artesano.activo}" type="button" class="btn btn-sm btn-danger"
+                      th:attr="onclick='abrirModalConfirmar(\'Desactivar artesano\', \'¿Desactivar a ' + ${artesano.nombre} + '?\', \'' + @{/admin/artesanos/{id}/desactivar(id=${artesano.id})} + '\')'">
+                <i class="bi bi-person-x me-1"></i>Desactivar
+              </button>
+              <button th:unless="${artesano.activo}" type="button" class="btn btn-sm btn-success"
+                      th:attr="onclick='abrirModalConfirmar(\'Activar artesano\', \'¿Activar a ' + ${artesano.nombre} + '?\', \'' + @{/admin/artesanos/{id}/activar(id=${artesano.id})} + '\')'">
+                <i class="bi bi-person-check me-1"></i>Activar
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary"
+                      th:attr="onclick='abrirModalConfirmar(\'Resetear contraseña\', \'¿Generar una contraseña temporal para ' + ${artesano.nombre} + '?\', \'' + @{/admin/artesanos/{id}/resetear-contrasena(id=${artesano.id})} + '\')'">
+                <i class="bi bi-key me-1"></i>Resetear contraseña
+              </button>
             </td>
           </tr>
         </tbody>
@@ -58,40 +66,48 @@
     </div>
   </div>
 
-  <!-- Modal de creación -->
-  <div class="modal fade" id="modalCrearUsuario" tabindex="-1"
-       aria-labelledby="modalCrearUsuarioLabel" aria-hidden="true">
+  <!-- Modal: nuevo artesano -->
+  <div class="modal fade" id="modalNuevo" tabindex="-1"
+       aria-labelledby="modalNuevoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalCrearUsuarioLabel">Nuevo Usuario</h5>
+          <h5 class="modal-title" id="modalNuevoLabel">Nuevo Artesano</h5>
           <button type="button" class="btn-close"
                   data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <form th:action="@{/admin/artesanos}" method="post">
+        <form th:action="@{/admin/artesanos}" th:object="${artesano}" method="post" id="formNuevoArtesano">
           <div class="modal-body">
             <div class="mb-3">
               <label for="nombre" class="form-label">Nombre</label>
               <input type="text" class="form-control" id="nombre"
-                     name="nombre" required>
+                     th:field="*{nombre}" required minlength="2" maxlength="100"
+                     data-mensaje-error="El nombre debe tener entre 2 y 100 caracteres">
+              <div class="invalid-feedback">El nombre debe tener entre 2 y 100 caracteres</div>
             </div>
             <div class="mb-3">
               <label for="correo" class="form-label">Correo</label>
               <input type="email" class="form-control" id="correo"
-                     name="correo" required>
+                     th:field="*{correo}" required
+                     data-mensaje-error="Ingresa un correo electrónico válido">
+              <div class="invalid-feedback">Ingresa un correo electrónico válido</div>
             </div>
             <div class="mb-3">
               <label for="contrasena" class="form-label">Contraseña</label>
-              <input type="password" class="form-control" id="contrasena"
-                     name="contrasena" required>
+              <div class="input-group">
+                <input type="password" class="form-control" id="contrasena"
+                       th:field="*{contrasena}" required minlength="6"
+                       pattern="^(?=.*[A-Z])(?=.*\d).{6,}$"
+                       data-mensaje-error="Mínimo 6 caracteres, una mayúscula y un número">
+                <button type="button" class="btn btn-outline-secondary btn-toggle-password"
+                        data-target="#contrasena" tabindex="-1">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <div class="invalid-feedback">Mínimo 6 caracteres, una mayúscula y un número</div>
+              </div>
+              <small class="text-muted">Mínimo 6 caracteres, una mayúscula y un número</small>
             </div>
-            <div class="mb-3">
-              <label for="rol" class="form-label">Rol</label>
-              <select class="form-select" id="rol" name="rol">
-                <option value="ARTESANO">Artesano</option>
-                <option value="ADMIN">Administrador</option>
-              </select>
-            </div>
+            <input type="hidden" th:field="*{rol}" value="ARTESANO">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary"
@@ -103,5 +119,87 @@
     </div>
   </div>
 
+  <!-- Modal: confirmación reutilizable -->
+  <div class="modal fade" id="modalConfirmar" tabindex="-1"
+       aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalConfirmarTitulo">Confirmar acción</h5>
+          <button type="button" class="btn-close"
+                  data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modalConfirmarCuerpo" class="mb-0">¿Confirmar esta acción?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Cancelar</button>
+          <form id="formConfirmar" action="" method="post" class="d-inline">
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: contraseña temporal -->
+  <div class="modal fade" id="modalContrasenaTemporal" tabindex="-1"
+       aria-labelledby="modalContrasenaTemporalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalContrasenaTemporalLabel">Contraseña temporal</h5>
+          <button type="button" class="btn-close"
+                  data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>La contraseña temporal de <strong><span id="spanArtesanoReseteado"></span></strong> es:
+            <strong><span id="spanContrasenaTemporal"></span></strong>
+          </p>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="btnCopiarContrasena">
+            <i class="bi bi-clipboard me-1"></i>Copiar
+          </button>
+          <p class="small text-muted mt-3 mb-0">Esta contraseña solo se muestra una vez.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${contrasenaTemporal != null}">
+    <script th:inline="javascript">
+      window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('spanContrasenaTemporal').textContent = /*[[${contrasenaTemporal}]]*/ '';
+        document.getElementById('spanArtesanoReseteado').textContent = /*[[${artesanoReseteado}]]*/ '';
+        new bootstrap.Modal(document.getElementById('modalContrasenaTemporal')).show();
+      });
+    </script>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      initPasswordToggle();
+      initValidacionInline();
+
+      var btnCopiar = document.getElementById('btnCopiarContrasena');
+      if (btnCopiar) {
+        btnCopiar.addEventListener('click', function () {
+          var texto = document.getElementById('spanContrasenaTemporal').textContent;
+          navigator.clipboard.writeText(texto);
+        });
+      }
+
+      document.getElementById('modalNuevo')
+        .addEventListener('show.bs.modal', function () {
+          limpiarErrores('formNuevoArtesano');
+          initValidacionInline();
+        });
+    });
+  </script>
+
 </div>
+</body>
 </html>

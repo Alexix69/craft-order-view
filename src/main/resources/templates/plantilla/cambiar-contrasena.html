@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Acceso | Classic Mueblería</title>
+  <title>Cambiar contraseña | Classic Mueblería</title>
   <link th:href="@{/assets/vendor/bootstrap-5.3.8.min.css}" rel="stylesheet">
   <link th:href="@{/assets/vendor/fontawesome-7.2.0/css/all.min.css}" rel="stylesheet">
   <link th:href="@{/assets/css/craftorder.css}" rel="stylesheet">
@@ -17,39 +17,36 @@
     <div class="card-body p-4">
 
       <div class="text-center mb-4">
-        <i class="fa-solid fa-hammer fa-2x mb-2"
+        <i class="fa-solid fa-key fa-2x mb-2"
            style="color:var(--co-primary)"></i>
         <h1 class="h5 fw-bold mb-0"
-            style="color:var(--co-text-primary)">Classic Mueblería</h1>
+            style="color:var(--co-text-primary)">Cambiar contraseña</h1>
         <p class="small mt-1"
-           style="color:var(--co-text-secondary)">Panel de gestión</p>
+           style="color:var(--co-text-secondary)">Debes establecer una nueva contraseña antes de continuar.</p>
       </div>
 
       <div id="errorGeneral" class="alert alert-danger py-2 small" th:classappend="${error} == null ? 'd-none' : ''" th:text="${error}"></div>
 
-      <form th:action="@{/login}" method="post">
-        <div class="mb-3">
-          <label for="correo" class="form-label">Correo</label>
-          <input type="email" class="form-control" id="correo"
-                 name="correo" required autofocus
-                 data-mensaje-error="Ingresa un correo electrónico válido">
-          <div class="invalid-feedback">Ingresa un correo electrónico válido</div>
-        </div>
-        <div class="mb-3">
-          <label for="contrasena" class="form-label">Contraseña</label>
+      <form th:action="@{/cambiar-contrasena}" method="post" id="formCambiarContrasena">
+        <div class="mb-1">
+          <label for="contrasenaNueva" class="form-label">Contraseña nueva</label>
           <div class="input-group">
-            <input type="password" class="form-control" id="contrasena"
-                   name="contrasena" required minlength="6"
-                   data-mensaje-error="La contraseña es obligatoria">
+            <input type="password" class="form-control" id="contrasenaNueva"
+                   name="contrasenaNueva" required minlength="6"
+                   pattern="^(?=.*[A-Z])(?=.*\d).{6,}$"
+                   data-mensaje-error="Mínimo 6 caracteres, una mayúscula y un número">
             <button type="button" class="btn btn-outline-secondary btn-toggle-password"
-                    data-target="#contrasena" tabindex="-1">
+                    data-target="#contrasenaNueva" tabindex="-1">
               <i class="fa-solid fa-eye"></i>
             </button>
-            <div class="invalid-feedback">La contraseña es obligatoria</div>
+            <div class="invalid-feedback">Mínimo 6 caracteres, una mayúscula y un número</div>
           </div>
         </div>
+        <p class="small mb-3" style="color:var(--co-text-secondary)">
+          Mínimo 6 caracteres, una mayúscula y un número
+        </p>
         <button type="submit" class="btn btn-primary w-100 mt-2">
-          Ingresar
+          Guardar contraseña
         </button>
       </form>
 

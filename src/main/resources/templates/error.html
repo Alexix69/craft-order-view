@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Error | Classic Mueblería</title>
+  <link th:href="@{/assets/vendor/bootstrap-5.3.8.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/fontawesome-7.2.0/css/all.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/craftorder.css}" rel="stylesheet">
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100"
+      style="background:var(--co-sidebar-bg)">
+
+  <div class="card shadow-sm text-center" style="width:100%;max-width:400px;
+       background:var(--co-bg-card);border:1px solid var(--co-border);
+       border-radius:12px">
+    <div class="card-body p-4">
+
+      <i class="fa-solid fa-triangle-exclamation fa-2x mb-2"
+         style="color:var(--co-primary)"></i>
+      <h1 class="h5 fw-bold mb-2"
+          style="color:var(--co-text-primary)"
+          th:text="${status != null ? status : 'Error'}">Error</h1>
+      <p class="small mb-4" style="color:var(--co-text-secondary)"
+         th:text="${status != null and status == 404}
+                   ? 'La página que buscas no existe.'
+                   : 'Ocurrió un error inesperado. Intenta de nuevo.'">
+        Ocurrió un error inesperado. Intenta de nuevo.
+      </p>
+      <a class="btn btn-primary w-100" th:href="@{/login}">Volver al inicio</a>
+
+    </div>
+  </div>
+
+</body>
+</html>

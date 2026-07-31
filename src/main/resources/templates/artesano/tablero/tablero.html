@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-artesano}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+<div layout:fragment="contenido">
+
+  <div class="card text-center py-5" style="background:var(--co-bg-card);border:1px solid var(--co-border);border-radius:12px">
+    <div class="card-body">
+      <i class="fa-solid fa-screwdriver-wrench fa-3x mb-3" style="color:var(--co-primary)"></i>
+      <h1 class="h4 fw-bold mb-2" style="color:var(--co-text-primary)"
+          th:text="${'Hola, ' + (usuarioNombre != null ? usuarioNombre : 'Artesano')}">Hola, Artesano</h1>
+      <p class="mb-0" style="color:var(--co-text-secondary)">
+        No tienes órdenes asignadas en este momento.
+      </p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
