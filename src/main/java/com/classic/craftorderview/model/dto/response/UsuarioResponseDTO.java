@@ -8,4 +8,6 @@ public class UsuarioResponseDTO {
     private String nombre;
     private String correo;
     private String rol;
+    private Boolean activo;
+    private Boolean primerLogin;
 }

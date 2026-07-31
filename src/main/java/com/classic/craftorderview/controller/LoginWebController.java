@@ -20,7 +20,15 @@ public class LoginWebController {
     }
 
     @GetMapping("/login")
-    public String mostrarLogin(Model model) {
+    public String mostrarLogin(Model model, HttpSession session) {
+        String rol = (String) session.getAttribute("usuarioRol");
+        if ("ADMIN".equals(rol)) {
+            return "redirect:/admin/dashboard";
+        }
+        if ("ARTESANO".equals(rol)) {
+            return "redirect:/artesano/tablero";
+        }
+
         model.addAttribute("error", null);
         return "plantilla/login";
     }
@@ -35,6 +43,11 @@ public class LoginWebController {
             session.setAttribute("usuarioNombre", usuario.getNombre());
             session.setAttribute("usuarioRol", usuario.getRol());
 
+            if (Boolean.TRUE.equals(usuario.getPrimerLogin())) {
+                session.setAttribute("primerLogin", true);
+                return "redirect:/cambiar-contrasena";
+            }
+
             if ("ADMIN".equals(usuario.getRol())) {
                 return "redirect:/admin/dashboard";
             } else if ("ARTESANO".equals(usuario.getRol())) {
@@ -45,9 +58,14 @@ public class LoginWebController {
                 return "plantilla/login";
             }
         } catch (Exception e) {
-            model.addAttribute("error",
-                "Credenciales incorrectas. Intente nuevamente.");
+            model.addAttribute("error", e.getMessage());
             return "plantilla/login";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
     }
 }
