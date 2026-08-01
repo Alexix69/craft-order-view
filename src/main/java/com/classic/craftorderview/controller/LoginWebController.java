@@ -1,5 +1,7 @@
 package com.classic.craftorderview.controller;
 
+import com.classic.craftorderview.constantes.ModelAtributos;
+import com.classic.craftorderview.constantes.Vistas;
 import com.classic.craftorderview.model.dto.request.LoginRequestDTO;
 import com.classic.craftorderview.model.dto.response.UsuarioResponseDTO;
 import com.classic.craftorderview.services.UsuarioApiService;
@@ -21,7 +23,7 @@ public class LoginWebController {
 
     @GetMapping("/login")
     public String mostrarLogin(Model model, HttpSession session) {
-        String rol = (String) session.getAttribute("usuarioRol");
+        String rol = (String) session.getAttribute(ModelAtributos.SESSION_USUARIO_ROL);
         if ("ADMIN".equals(rol)) {
             return "redirect:/admin/dashboard";
         }
@@ -30,7 +32,7 @@ public class LoginWebController {
         }
 
         model.addAttribute("error", null);
-        return "plantilla/login";
+        return Vistas.LOGIN;
     }
 
     @PostMapping("/login")
@@ -39,12 +41,12 @@ public class LoginWebController {
                                 Model model) {
         try {
             UsuarioResponseDTO usuario = usuarioService.autenticar(dto);
-            session.setAttribute("usuarioId", usuario.getId());
-            session.setAttribute("usuarioNombre", usuario.getNombre());
-            session.setAttribute("usuarioRol", usuario.getRol());
+            session.setAttribute(ModelAtributos.SESSION_USUARIO_ID, usuario.getId());
+            session.setAttribute(ModelAtributos.SESSION_USUARIO_NOMBRE, usuario.getNombre());
+            session.setAttribute(ModelAtributos.SESSION_USUARIO_ROL, usuario.getRol());
 
             if (Boolean.TRUE.equals(usuario.getPrimerLogin())) {
-                session.setAttribute("primerLogin", true);
+                session.setAttribute(ModelAtributos.SESSION_PRIMER_LOGIN, true);
                 return "redirect:/cambiar-contrasena";
             }
 
@@ -55,11 +57,11 @@ public class LoginWebController {
             } else {
                 model.addAttribute("error",
                     "Rol no reconocido. Contacte al administrador.");
-                return "plantilla/login";
+                return Vistas.LOGIN;
             }
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
-            return "plantilla/login";
+            return Vistas.LOGIN;
         }
     }
 

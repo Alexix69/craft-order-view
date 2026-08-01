@@ -1,39 +1,57 @@
-<html xmlns:th="http://www.thymeleaf.org"
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{plantilla/base-admin}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
 
 <div layout:fragment="contenidopaginas">
 
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h4 fw-bold mb-0"
-        style="color:var(--co-text-primary)">Gestión de Tipos de Mueble</h1>
-    <button type="button" class="btn btn-primary"
-            data-bs-toggle="modal" data-bs-target="#modalCrearTipo">
-      <i class="fa-solid fa-plus me-1"></i>
-      Nuevo Tipo de Mueble
+    <h1 class="h4 fw-bold mb-0" style="color:var(--co-text-primary)">Gestión de Tipos de Mueble</h1>
+    <button type="button" class="btn btn-primary" id="btnNuevoTipoMueble"
+            data-bs-toggle="modal" data-bs-target="#modalTipoMueble"
+            th:attr="data-crear-url=@{/admin/tiposmueble}">
+      <i class="fa-solid fa-plus me-1"></i>Nuevo Tipo de Mueble
     </button>
   </div>
 
-  <div th:if="${errorConexion}"
-       class="alert alert-warning"
-       th:text="${errorConexion}"></div>
+  <form th:action="@{/admin/tiposmueble}" method="get" class="d-flex gap-2 mb-3">
+    <input type="text"
+           class="form-control form-control-sm"
+           name="nombre"
+           th:value="${nombre}"
+           placeholder="Buscar por nombre..."
+           style="max-width:300px">
+    <button type="submit" class="btn btn-sm btn-outline-secondary">
+      <i class="fa-solid fa-magnifying-glass me-1"></i>Buscar
+    </button>
+    <a th:if="${nombre != null and !#strings.isEmpty(nombre)}"
+       th:href="@{/admin/tiposmueble}"
+       class="btn btn-sm btn-outline-danger">
+      <i class="fa-solid fa-xmark me-1"></i>Limpiar
+    </a>
+  </form>
 
   <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
+      <table class="table table-hover align-middle mb-0">
         <thead>
           <tr style="border-bottom:2px solid var(--co-border)">
             <th style="color:var(--co-text-secondary)">Imagen</th>
             <th style="color:var(--co-text-secondary)">Nombre</th>
             <th style="color:var(--co-text-secondary)">Descripción</th>
             <th style="color:var(--co-text-secondary)">Costo M.O.</th>
-            <th style="color:var(--co-text-secondary)">Acciones</th>
+            <th style="color:var(--co-text-secondary)">Estado</th>
+            <th class="text-end" style="color:var(--co-text-secondary)">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr th:if="${#lists.isEmpty(tiposMueble)}">
-            <td colspan="5" class="text-center py-4"
-                style="color:var(--co-text-muted)">
+            <td colspan="6" class="text-center py-4" style="color:var(--co-text-muted)">
               No hay tipos de mueble registrados.
             </td>
           </tr>
@@ -41,25 +59,33 @@
             <td>
               <img th:if="${tipo.fotoUrl != null and !tipo.fotoUrl.isEmpty()}"
                    th:src="${tipo.fotoUrl}"
-                   style="width:48px;height:48px;object-fit:cover;border-radius:6px"/>
-              <i th:unless="${tipo.fotoUrl != null and !tipo.fotoUrl.isEmpty()}"
-                 class="fa-solid fa-couch fa-lg"
-                 style="color:var(--co-text-muted)"></i>
+                   th:alt="${tipo.nombre}"
+                   class="rounded"
+                   style="width:50px;height:50px;object-fit:cover;"/>
+              <span th:unless="${tipo.fotoUrl != null and !tipo.fotoUrl.isEmpty()}"
+                    class="text-muted small">Sin imagen</span>
             </td>
-            <td th:text="${tipo.nombre}"
-                style="color:var(--co-text-primary)"></td>
-            <td th:text="${tipo.descripcion}"
-                style="color:var(--co-text-secondary)"></td>
+            <td th:text="${tipo.nombre}" style="color:var(--co-text-primary)"></td>
+            <td th:text="${tipo.descripcion}" style="color:var(--co-text-secondary)"></td>
             <td th:text="${#numbers.formatDecimal(tipo.costoBaseMo,1,'COMMA',2,'POINT')}"
                 style="color:var(--co-text-secondary)"></td>
             <td>
-              <form th:action="@{/admin/tiposmueble/{id}/desactivar(id=${tipo.id})}"
-                    method="post" class="d-inline">
-                <button type="submit" class="btn btn-sm btn-danger"
-                        onclick="return confirm('¿Desactivar este tipo de mueble?')">
-                  Desactivar
-                </button>
-              </form>
+              <span th:if="${tipo.activo}" class="badge bg-success">Activo</span>
+              <span th:unless="${tipo.activo}" class="badge bg-danger">Inactivo</span>
+            </td>
+            <td class="text-end">
+              <a th:href="@{/admin/tiposmueble/{id}/editar(id=${tipo.id})}"
+                 class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-pen me-1"></i>Editar
+              </a>
+              <button th:if="${tipo.activo}" type="button" class="btn btn-sm btn-danger"
+                      th:attr="onclick='abrirModalConfirmar(\'Desactivar tipo de mueble\', \'¿Desactivar ' + ${tipo.nombre} + '?\', \'' + @{/admin/tiposmueble/{id}/desactivar(id=${tipo.id})} + '\')'">
+                <i class="fa-solid fa-ban me-1"></i>Desactivar
+              </button>
+              <button th:unless="${tipo.activo}" type="button" class="btn btn-sm btn-success"
+                      th:attr="onclick='abrirModalConfirmar(\'Activar tipo de mueble\', \'¿Activar ' + ${tipo.nombre} + '?\', \'' + @{/admin/tiposmueble/{id}/activar(id=${tipo.id})} + '\')'">
+                <i class="fa-solid fa-check me-1"></i>Activar
+              </button>
             </td>
           </tr>
         </tbody>
@@ -67,94 +93,109 @@
     </div>
   </div>
 
-  <!-- Modal de creación -->
-  <div class="modal fade" id="modalCrearTipo" tabindex="-1"
-       aria-labelledby="modalCrearTipoLabel" aria-hidden="true">
+  <div th:replace="~{fragmentos/paginacion :: controles(
+      ${pagina},
+      '/admin/tiposmueble',
+      ${nombre != null and !#strings.isEmpty(nombre) ? 'nombre=' + nombre : ''}
+  )}"></div>
+
+  <!-- Modal: creación / edición -->
+  <div class="modal fade" id="modalTipoMueble" tabindex="-1"
+       aria-labelledby="modalTipoMuebleLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalCrearTipoLabel">Nuevo Tipo de Mueble</h5>
-          <button type="button" class="btn-close"
-                  data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <h5 class="modal-title" id="modalTipoMuebleLabel"
+              th:text="${tipoMuebleEditar != null ? 'Editar Tipo de Mueble' : 'Nuevo Tipo de Mueble'}">
+            Nuevo Tipo de Mueble
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <form th:action="@{/admin/tiposmueble}" method="post">
+        <form id="formTipoMueble" method="post" enctype="multipart/form-data"
+              th:with="datosForm=${tipoMuebleEditar != null ? tipoMuebleEditar : tipoMuebleNuevo}"
+              th:action="${tipoMuebleEditar != null}
+                         ? @{/admin/tiposmueble/{id}/actualizar(id=${tipoMuebleEditar.id})}
+                         : @{/admin/tiposmueble}">
           <div class="modal-body">
+            <div th:if="${errorModal != null}"
+                 class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+              <i class="fa-solid fa-circle-exclamation me-2"></i>
+              <span th:text="${errorModal}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="nombre"
-                     name="nombre" required>
+              <label for="nombre" class="form-label required-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre"
+                     required minlength="2" maxlength="100"
+                     th:value="${datosForm?.nombre}"
+                     data-mensaje-error="El nombre es obligatorio y debe tener entre 2 y 100 caracteres">
+              <div class="invalid-feedback">El nombre es obligatorio y debe tener entre 2 y 100 caracteres</div>
             </div>
             <div class="mb-3">
               <label for="descripcion" class="form-label">Descripción</label>
-              <textarea class="form-control" id="descripcion"
-                        name="descripcion" rows="2"></textarea>
+              <textarea class="form-control" id="descripcion" name="descripcion" rows="2"
+                        th:text="${datosForm?.descripcion}"></textarea>
             </div>
             <div class="mb-3">
-              <label for="costoBaseMo" class="form-label">Costo M.O.</label>
-              <input type="number" class="form-control" id="costoBaseMo"
-                     name="costoBaseMo" step="0.01" min="0" required>
+              <label for="costoBaseMo" class="form-label required-label">Costo M.O.</label>
+              <input type="number" class="form-control" id="costoBaseMo" name="costoBaseMo"
+                     step="0.01" min="0.01" required
+                     th:value="${datosForm?.costoBaseMo}"
+                     data-mensaje-error="El costo de mano de obra debe ser mayor a 0">
+              <div class="invalid-feedback">El costo de mano de obra debe ser mayor a 0</div>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Imagen</label>
+              <label class="form-label required-label">Imagen</label>
 
-              <p class="small mb-2" style="color:var(--co-text-secondary)">
-                Seleccionar de galería
-              </p>
-              <div class="row row-cols-3 g-2 mb-3" id="galeriaImagenes">
-                <div class="col">
-                  <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400"
-                       data-url="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400"
-                       class="img-thumbnail miniatura-galeria"
-                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
-                </div>
-                <div class="col">
-                  <img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400"
-                       data-url="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400"
-                       class="img-thumbnail miniatura-galeria"
-                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
-                </div>
-                <div class="col">
-                  <img src="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=400"
-                       data-url="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=400"
-                       class="img-thumbnail miniatura-galeria"
-                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
-                </div>
-                <div class="col">
-                  <img src="https://images.unsplash.com/photo-1551298370-9d3d53740c72?w=400"
-                       data-url="https://images.unsplash.com/photo-1551298370-9d3d53740c72?w=400"
-                       class="img-thumbnail miniatura-galeria"
-                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
-                </div>
-                <div class="col">
-                  <img src="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=400"
-                       data-url="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=400"
-                       class="img-thumbnail miniatura-galeria"
-                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
-                </div>
-                <div class="col">
-                  <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400"
-                       data-url="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400"
-                       class="img-thumbnail miniatura-galeria"
-                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
-                </div>
+              <!-- Miniaturas con scroll horizontal -->
+              <div class="d-flex gap-2 overflow-auto pb-2 mb-2"
+                   id="galeriaScroll"
+                   style="max-height:120px; cursor:pointer">
+                <img th:each="url : ${galeriaImagenes}"
+                     th:src="${url}"
+                     th:data-url="${url}"
+                     alt="Miniatura de galería"
+                     class="img-galeria-miniatura rounded border"
+                     style="height:90px; width:90px; object-fit:cover; flex-shrink:0;
+                            transition: border-color 0.2s;"
+                     onclick="abrirPreviewImagen(this.dataset.url)"
+                     title="Click para ampliar">
               </div>
 
-              <p class="small mb-2" style="color:var(--co-text-secondary)">
-                Subir imagen propia
-              </p>
-              <input type="file" class="form-control" id="archivoImagen" accept="image/*">
+              <!-- Input file para imagen propia -->
+              <div class="mt-2">
+                <label class="form-label small text-muted">O sube tu propia imagen</label>
+                <input type="file"
+                       class="form-control form-control-sm"
+                       id="imagenFile"
+                       name="imagenFile"
+                       accept="image/*"
+                       onchange="previewImagenPropia(this)">
+              </div>
 
-              <input type="hidden" id="fotoUrl" name="fotoUrl">
+              <!-- Preview de imagen seleccionada -->
+              <div id="previewContenedor" class="mt-2"
+                   th:style="${datosForm != null and datosForm.fotoUrl != null and !datosForm.fotoUrl.isEmpty()} ? 'display:block' : 'display:none'">
+                <p class="small text-muted mb-1">Vista previa:</p>
+                <img id="previewImagen"
+                     th:src="${datosForm?.fotoUrl}"
+                     alt="Vista previa"
+                     class="rounded border"
+                     style="height:120px; width:auto; object-fit:cover;">
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary ms-2"
+                        onclick="limpiarImagen()">
+                  <i class="fa-solid fa-xmark"></i> Quitar imagen
+                </button>
+              </div>
 
-              <img id="previewImagen" alt="Vista previa"
-                   style="display:none;width:100%;max-height:120px;
-                          object-fit:cover;border-radius:8px;margin-top:8px"/>
+              <!-- Input hidden que guarda la URL final -->
+              <input type="hidden" id="fotoUrl" name="fotoUrl" th:value="${datosForm?.fotoUrl}">
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary"
-                    data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             <button type="submit" class="btn btn-primary">Guardar</button>
           </div>
         </form>
@@ -162,52 +203,91 @@
     </div>
   </div>
 
-  <script>
-    (function () {
-      var miniaturas = document.querySelectorAll('.miniatura-galeria');
-      var inputArchivo = document.getElementById('archivoImagen');
-      var campoFotoUrl = document.getElementById('fotoUrl');
-      var preview = document.getElementById('previewImagen');
+  <!-- Modal de preview de imagen -->
+  <div class="modal fade" id="modalPreviewImagen" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center p-2">
+          <img id="imgPreviewGrande" src="" alt="Vista ampliada" class="img-fluid rounded" style="max-height:400px">
+        </div>
+        <div class="modal-footer border-0 justify-content-center">
+          <button type="button" class="btn btn-primary" onclick="seleccionarImagenGaleria()">
+            <i class="fa-solid fa-check me-1"></i>Usar esta imagen
+          </button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      function marcarSeleccion(el) {
-        miniaturas.forEach(function (m) {
-          m.style.borderColor = 'var(--co-border)';
-          m.classList.remove('border-primary');
-        });
-        if (el) {
-          el.style.borderColor = 'var(--co-primary)';
-          el.classList.add('border-primary');
-        }
-      }
+  <!-- Modal: confirmación reutilizable -->
+  <div class="modal fade" id="modalConfirmar" tabindex="-1"
+       aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalConfirmarTitulo">Confirmar acción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modalConfirmarCuerpo" class="mb-0">¿Confirmar esta acción?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <form id="formConfirmar" action="" method="post" class="d-inline">
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      function mostrarPreview(url) {
-        preview.src = url;
-        preview.style.display = 'block';
-      }
-
-      miniaturas.forEach(function (img) {
-        img.addEventListener('click', function () {
-          var url = img.getAttribute('data-url');
-          campoFotoUrl.value = url;
-          marcarSeleccion(img);
-          mostrarPreview(url);
-          inputArchivo.value = '';
-        });
+  <div th:if="${tipoMuebleEditar != null or abrirModal == true}">
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        new bootstrap.Modal(document.getElementById('modalTipoMueble')).show();
       });
+    </script>
+  </div>
 
-      inputArchivo.addEventListener('change', function () {
-        var archivo = inputArchivo.files && inputArchivo.files[0];
-        if (!archivo) return;
-        var lector = new FileReader();
-        lector.onload = function (e) {
-          campoFotoUrl.value = e.target.result;
-          marcarSeleccion(null);
-          mostrarPreview(e.target.result);
-        };
-        lector.readAsDataURL(archivo);
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      initValidacionInline();
+
+      document.getElementById('modalTipoMueble')
+        .addEventListener('show.bs.modal', function () {
+          // Solo limpiar si es creación nueva: ni edición ni reapertura por error del backend
+          // (una reapertura por error debe conservar lo que el usuario escribió — Prueba 4)
+          const esEdicion = /*[[${tipoMuebleEditar != null}]]*/ false;
+          const tieneError = /*[[${errorModal != null}]]*/ false;
+          if (!esEdicion && !tieneError) {
+            limpiarErrores('formTipoMueble');
+            limpiarImagen();
+          }
+        });
+
+      // El botón "Nuevo" abre el mismo modal sin recargar la página, así que el
+      // estado horneado por Thymeleaf (título/acción/valores de una edición previa
+      // en esta misma carga de página) puede seguir presente. Este botón es la
+      // fuente de verdad: siempre fuerza el modal a estado "creación" al click.
+      document.getElementById('btnNuevoTipoMueble').addEventListener('click', function () {
+        document.getElementById('modalTipoMuebleLabel').textContent = 'Nuevo Tipo de Mueble';
+        document.getElementById('formTipoMueble').setAttribute('action', this.dataset.crearUrl);
+        // limpiarErrores() hace form.reset(), que restaura los valores por defecto
+        // horneados por Thymeleaf (los de la edición anterior) — por eso los campos
+        // se vacían explícitamente después, no antes.
+        limpiarErrores('formTipoMueble');
+        document.getElementById('nombre').value = '';
+        document.getElementById('descripcion').value = '';
+        document.getElementById('costoBaseMo').value = '';
+        limpiarImagen();
       });
-    })();
+    });
   </script>
 
 </div>
+</body>
 </html>

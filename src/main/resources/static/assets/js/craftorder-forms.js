@@ -105,10 +105,3 @@ function validarCampoInline(input) {
     }
   }
 }
-
-function abrirModalConfirmar(titulo, cuerpo, accion) {
-  document.getElementById('modalConfirmarTitulo').textContent = titulo;
-  document.getElementById('modalConfirmarCuerpo').textContent = cuerpo;
-  document.getElementById('formConfirmar').action = accion;
-  new bootstrap.Modal(document.getElementById('modalConfirmar')).show();
-}
