@@ -1,54 +1,80 @@
-<html xmlns:th="http://www.thymeleaf.org"
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{plantilla/base-admin}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
 
 <div layout:fragment="contenidopaginas">
 
   <!-- Sección 1: Materiales -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 fw-bold mb-0"
-        style="color:var(--co-text-primary)">Materiales de Construcción</h2>
-    <button type="button" class="btn btn-primary"
-            data-bs-toggle="modal" data-bs-target="#modalCrearMaterial">
-      <i class="fa-solid fa-plus me-1"></i>
-      Nuevo Material
+    <h1 class="h4 fw-bold mb-0" style="color:var(--co-text-primary)">Materiales</h1>
+    <button type="button" class="btn btn-primary" id="btnNuevoMaterial"
+            data-bs-toggle="modal" data-bs-target="#modalMaterial"
+            th:attr="data-crear-url=@{/admin/materiales}">
+      <i class="fa-solid fa-plus me-1"></i>Nuevo Material
     </button>
   </div>
 
-  <div th:if="${errorConexion}"
-       class="alert alert-warning"
-       th:text="${errorConexion}"></div>
+  <form th:action="@{/admin/materiales}" method="get" class="d-flex gap-2 mb-3">
+    <input type="text"
+           class="form-control form-control-sm"
+           name="nombre"
+           th:value="${nombre}"
+           placeholder="Buscar por nombre..."
+           style="max-width:300px">
+    <button type="submit" class="btn btn-sm btn-outline-secondary">
+      <i class="fa-solid fa-magnifying-glass me-1"></i>Buscar
+    </button>
+    <a th:if="${nombre != null and !#strings.isEmpty(nombre)}"
+       th:href="@{/admin/materiales}"
+       class="btn btn-sm btn-outline-danger">
+      <i class="fa-solid fa-xmark me-1"></i>Limpiar
+    </a>
+  </form>
 
   <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
+      <table class="table table-hover align-middle mb-0">
         <thead>
           <tr style="border-bottom:2px solid var(--co-border)">
             <th style="color:var(--co-text-secondary)">Nombre</th>
             <th style="color:var(--co-text-secondary)">Precio por m³</th>
-            <th style="color:var(--co-text-secondary)">Acciones</th>
+            <th style="color:var(--co-text-secondary)">Estado</th>
+            <th class="text-end" style="color:var(--co-text-secondary)">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr th:if="${#lists.isEmpty(materiales)}">
-            <td colspan="3" class="text-center py-4"
-                style="color:var(--co-text-muted)">
+            <td colspan="4" class="text-center py-4" style="color:var(--co-text-muted)">
               No hay materiales registrados.
             </td>
           </tr>
           <tr th:each="material : ${materiales}">
-            <td th:text="${material.nombre}"
-                style="color:var(--co-text-primary)"></td>
+            <td th:text="${material.nombre}" style="color:var(--co-text-primary)"></td>
             <td th:text="${#numbers.formatDecimal(material.precioPorM3,1,'COMMA',2,'POINT')} + ' $/m³'"
                 style="color:var(--co-text-secondary)"></td>
             <td>
-              <form th:action="@{/admin/materiales/{id}/desactivar(id=${material.id})}"
-                    method="post" class="d-inline">
-                <button type="submit" class="btn btn-sm btn-danger"
-                        onclick="return confirm('¿Desactivar este material?')">
-                  Desactivar
-                </button>
-              </form>
+              <span th:if="${material.activo}" class="badge bg-success">Activo</span>
+              <span th:unless="${material.activo}" class="badge bg-danger">Inactivo</span>
+            </td>
+            <td class="text-end">
+              <a th:href="@{/admin/materiales/{id}/editar(id=${material.id})}"
+                 class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-pen me-1"></i>Editar
+              </a>
+              <button th:if="${material.activo}" type="button" class="btn btn-sm btn-danger"
+                      th:attr="onclick='abrirModalConfirmar(\'Desactivar material\', \'¿Desactivar ' + ${material.nombre} + '?\', \'' + @{/admin/materiales/{id}/desactivar(id=${material.id})} + '\')'">
+                <i class="fa-solid fa-ban me-1"></i>Desactivar
+              </button>
+              <button th:unless="${material.activo}" type="button" class="btn btn-sm btn-success"
+                      th:attr="onclick='abrirModalConfirmar(\'Activar material\', \'¿Activar ' + ${material.nombre} + '?\', \'' + @{/admin/materiales/{id}/activar(id=${material.id})} + '\')'">
+                <i class="fa-solid fa-check me-1"></i>Activar
+              </button>
             </td>
           </tr>
         </tbody>
@@ -56,36 +82,58 @@
     </div>
   </div>
 
-  <!-- Modal de creación de material -->
-  <div class="modal fade" id="modalCrearMaterial" tabindex="-1"
-       aria-labelledby="modalCrearMaterialLabel" aria-hidden="true">
+  <div th:replace="~{fragmentos/paginacion :: controles(
+      ${pagina},
+      '/admin/materiales',
+      ${nombre != null and !#strings.isEmpty(nombre) ? 'nombre=' + nombre : ''}
+  )}"></div>
+
+  <!-- Modal: creación / edición de material -->
+  <div class="modal fade" id="modalMaterial" tabindex="-1"
+       aria-labelledby="modalMaterialLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalCrearMaterialLabel">Nuevo Material</h5>
-          <button type="button" class="btn-close"
-                  data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <h5 class="modal-title" id="modalMaterialLabel"
+              th:text="${materialEditar != null ? 'Editar Material' : 'Nuevo Material'}">
+            Nuevo Material
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <form th:action="@{/admin/materiales}" method="post">
+        <form id="formMaterial" method="post"
+              th:with="datosForm=${materialEditar != null ? materialEditar : materialNuevo}"
+              th:action="${materialEditar != null}
+                         ? @{/admin/materiales/{id}/actualizar(id=${materialEditar.id})}
+                         : @{/admin/materiales}">
           <div class="modal-body">
-            <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="nombre"
-                     name="nombre" required>
+            <div th:if="${errorModal != null}"
+                 class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+              <i class="fa-solid fa-circle-exclamation me-2"></i>
+              <span th:text="${errorModal}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             <div class="mb-3">
-              <label for="precioPorM3" class="form-label">Precio por m³</label>
-              <input type="number" class="form-control" id="precioPorM3"
-                     name="precioPorM3" step="0.01" min="0" required>
+              <label for="nombre" class="form-label required-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre"
+                     required minlength="2" maxlength="100"
+                     th:value="${datosForm?.nombre}"
+                     data-mensaje-error="El nombre es obligatorio y debe tener entre 2 y 100 caracteres">
+              <div class="invalid-feedback">El nombre es obligatorio y debe tener entre 2 y 100 caracteres</div>
+            </div>
+            <div class="mb-3">
+              <label for="precioPorM3" class="form-label required-label">Precio por m³</label>
+              <input type="number" class="form-control" id="precioPorM3" name="precioPorM3"
+                     step="0.01" min="0.01" required
+                     th:value="${datosForm?.precioPorM3}"
+                     data-mensaje-error="El precio debe ser mayor a 0">
+              <div class="invalid-feedback">El precio debe ser mayor a 0</div>
               <div class="form-text">
-                Ingrese el precio en unidades enteras. Ejemplo: 850 equivale
-                a $850 por metro cúbico.
+                Ingrese el precio en m³. Ejemplo: 850 equivale a $850 por metro cúbico.
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary"
-                    data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             <button type="submit" class="btn btn-primary">Guardar</button>
           </div>
         </form>
@@ -93,11 +141,40 @@
     </div>
   </div>
 
+  <div th:if="${materialEditar != null or abrirModal == true}">
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        new bootstrap.Modal(document.getElementById('modalMaterial')).show();
+      });
+    </script>
+  </div>
+
+  <!-- Modal: confirmación reutilizable -->
+  <div class="modal fade" id="modalConfirmar" tabindex="-1"
+       aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalConfirmarTitulo">Confirmar acción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modalConfirmarCuerpo" class="mb-0">¿Confirmar esta acción?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <form id="formConfirmar" action="" method="post" class="d-inline">
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <hr style="border-color:var(--co-border);margin:2rem 0">
 
   <!-- Sección 2: Tipos de Acabado -->
-  <h2 class="h4 fw-bold mb-1"
-      style="color:var(--co-text-primary)">Tipos de Acabado</h2>
+  <h2 class="h4 fw-bold mb-1" style="color:var(--co-text-primary)">Tipos de Acabado</h2>
   <p class="small mb-3" style="color:var(--co-text-secondary)">
     Los tipos de acabado son fijos del sistema (LACA, PINTURA, NATURAL).
     Solo puede modificarse el porcentaje de costo que aplica cada uno.
@@ -110,97 +187,99 @@
           <tr style="border-bottom:2px solid var(--co-border)">
             <th style="color:var(--co-text-secondary)">Acabado</th>
             <th style="color:var(--co-text-secondary)">Porcentaje</th>
-            <th style="color:var(--co-text-secondary)">Acciones</th>
+            <th class="text-end" style="color:var(--co-text-secondary)">Acciones</th>
           </tr>
         </thead>
         <tbody>
-
-          <!-- Fallback: el back aún no expone /api/materiales/acabados -->
-          <th:block th:if="${#lists.isEmpty(acabados)}">
-            <tr th:each="tipoFijo : ${tiposAcabadoDefault}" class="fila-vista" th:id="|vista-${tipoFijo}|">
-              <td th:text="${tipoFijo}" style="color:var(--co-text-primary)"></td>
-              <td><span class="valor-porcentaje" style="color:var(--co-text-secondary)">--</span></td>
-              <td>
-                <button type="button" class="btn btn-sm btn-outline-primary btn-editar-acabado" th:attr="data-tipo=${tipoFijo}">Editar</button>
-              </td>
-            </tr>
-            <tr th:each="tipoFijo : ${tiposAcabadoDefault}" class="fila-edicion" style="display:none" th:id="|edicion-${tipoFijo}|">
-              <td th:text="${tipoFijo}" style="color:var(--co-text-primary)"></td>
-              <td>
-                <form th:action="@{/admin/materiales/acabados/{tipo}/porcentaje(tipo=${tipoFijo})}" method="post" class="d-flex align-items-center gap-2">
-                  <input type="number" class="form-control form-control-sm" name="porcentaje" min="0" max="100" step="1" style="width:80px">
-                  <span style="color:var(--co-text-secondary)">%</span>
-                  <button type="submit" class="btn btn-sm btn-primary">Guardar</button>
-                  <button type="button" class="btn btn-sm btn-secondary btn-cancelar-acabado" th:attr="data-tipo=${tipoFijo}">Cancelar</button>
-                </form>
-              </td>
-              <td></td>
-            </tr>
-          </th:block>
-
-          <!-- Datos reales del back -->
-          <th:block th:unless="${#lists.isEmpty(acabados)}">
-            <tr th:each="acabado : ${acabados}" class="fila-vista" th:id="|vista-${acabado.tipo}|">
-              <td th:text="${acabado.tipo}" style="color:var(--co-text-primary)"></td>
-              <td>
-                <span class="valor-porcentaje" th:text="${acabado.porcentaje + '%'}" style="color:var(--co-text-secondary)">--</span>
-              </td>
-              <td>
-                <button type="button" class="btn btn-sm btn-outline-primary btn-editar-acabado" th:attr="data-tipo=${acabado.tipo}">Editar</button>
-              </td>
-            </tr>
-            <tr th:each="acabado : ${acabados}" class="fila-edicion" style="display:none" th:id="|edicion-${acabado.tipo}|">
-              <td th:text="${acabado.tipo}" style="color:var(--co-text-primary)"></td>
-              <td>
-                <form th:action="@{/admin/materiales/acabados/{tipo}/porcentaje(tipo=${acabado.tipo})}" method="post" class="d-flex align-items-center gap-2">
-                  <input type="number" class="form-control form-control-sm" name="porcentaje" min="0" max="100" step="1" style="width:80px" th:value="${acabado.porcentaje}">
-                  <span style="color:var(--co-text-secondary)">%</span>
-                  <button type="submit" class="btn btn-sm btn-primary">Guardar</button>
-                  <button type="button" class="btn btn-sm btn-secondary btn-cancelar-acabado" th:attr="data-tipo=${acabado.tipo}">Cancelar</button>
-                </form>
-              </td>
-              <td></td>
-            </tr>
-          </th:block>
-
+          <tr th:each="acabado : ${acabados}">
+            <td th:text="${acabado.tipo}" style="color:var(--co-text-primary)"></td>
+            <td th:text="${acabado.porcentaje} + '%'" style="color:var(--co-text-secondary)"></td>
+            <td class="text-end">
+              <button type="button" class="btn btn-sm btn-outline-primary"
+                      th:attr="onclick='abrirModalAcabado(\'' + ${acabado.tipo} + '\', \'' + ${acabado.porcentaje} + '\')'">
+                <i class="fa-solid fa-pen me-1"></i>Editar porcentaje
+              </button>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <script>
-    (function () {
-      function cerrarTodasLasEdiciones() {
-        document.querySelectorAll('.fila-edicion').forEach(function (tr) {
-          tr.style.display = 'none';
-        });
-        document.querySelectorAll('.fila-vista').forEach(function (tr) {
-          tr.style.display = '';
-        });
+  <!-- Modal: edición de porcentaje de acabado -->
+  <div class="modal fade" id="modalAcabado" tabindex="-1"
+       aria-labelledby="modalAcabadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAcabadoLabel">Editar porcentaje de acabado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="formAcabado" method="post" action="">
+          <div class="modal-body">
+            <div th:if="${errorModalAcabado != null}"
+                 class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+              <i class="fa-solid fa-circle-exclamation me-2"></i>
+              <span th:text="${errorModalAcabado}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <input type="hidden" id="acabadoTipo" name="tipo">
+            <div class="mb-3">
+              <label for="acabadoPorcentaje" class="form-label required-label">Porcentaje</label>
+              <input type="number" class="form-control" id="acabadoPorcentaje" name="porcentaje"
+                     step="0.01" min="0" max="100" required
+                     data-mensaje-error="El porcentaje debe estar entre 0 y 100">
+              <div class="invalid-feedback">El porcentaje debe estar entre 0 y 100</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      initValidacionInline();
+
+      var abrirModalAcabadoFlag = /*[[${abrirModalAcabado}]]*/ false;
+      if (abrirModalAcabadoFlag) {
+        var tipoError = /*[[${acabadoTipoError}]]*/ '';
+        var porcentajeError = /*[[${acabadoPorcentajeError}]]*/ 0;
+        abrirModalAcabado(tipoError, porcentajeError);
       }
 
-      document.querySelectorAll('.btn-editar-acabado').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var tipo = btn.getAttribute('data-tipo');
-          cerrarTodasLasEdiciones();
-          var vista = document.getElementById('vista-' + tipo);
-          var edicion = document.getElementById('edicion-' + tipo);
-          if (vista) vista.style.display = 'none';
-          if (edicion) edicion.style.display = '';
+      document.getElementById('modalMaterial')
+        .addEventListener('show.bs.modal', function () {
+          // No limpiar si se está editando o si se reabre por un error del backend
+          // (debe conservar lo que el usuario escribió)
+          const esEdicion = /*[[${materialEditar != null}]]*/ false;
+          const tieneError = /*[[${errorModal != null}]]*/ false;
+          if (!esEdicion && !tieneError) {
+            limpiarErrores('formMaterial');
+          }
         });
-      });
 
-      document.querySelectorAll('.btn-cancelar-acabado').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var tipo = btn.getAttribute('data-tipo');
-          var vista = document.getElementById('vista-' + tipo);
-          var edicion = document.getElementById('edicion-' + tipo);
-          if (edicion) edicion.style.display = 'none';
-          if (vista) vista.style.display = '';
-        });
+      // El botón "Nuevo" abre el mismo modal sin recargar la página, así que el
+      // estado horneado por Thymeleaf (título/acción/valores de una edición previa
+      // en esta misma carga de página) puede seguir presente. Este botón es la
+      // fuente de verdad: siempre fuerza el modal a estado "creación" al click.
+      document.getElementById('btnNuevoMaterial').addEventListener('click', function () {
+        document.getElementById('modalMaterialLabel').textContent = 'Nuevo Material';
+        document.getElementById('formMaterial').setAttribute('action', this.dataset.crearUrl);
+        // limpiarErrores() hace form.reset(), que restaura los valores por defecto
+        // horneados por Thymeleaf (los de la edición anterior) — por eso los campos
+        // se vacían explícitamente después, no antes.
+        limpiarErrores('formMaterial');
+        document.getElementById('nombre').value = '';
+        document.getElementById('precioPorM3').value = '';
       });
-    })();
+    });
   </script>
 
 </div>
+</body>
 </html>

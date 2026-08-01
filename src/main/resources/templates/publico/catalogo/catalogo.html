@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-publico}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+<div layout:fragment="contenido">
+
+  <div class="text-center mb-4">
+    <h1 class="fw-bold" style="color:var(--co-text-primary)">Nuestros Muebles</h1>
+    <p style="color:var(--co-text-secondary)">
+      Explora nuestra colección artesanal y solicita tu cotización personalizada.
+    </p>
+  </div>
+
+  <form th:action="@{/catalogo}" method="get"
+        class="d-flex gap-2 mb-4 justify-content-center">
+    <input type="text"
+           class="form-control"
+           name="nombre"
+           th:value="${nombre}"
+           placeholder="Buscar tipo de mueble..."
+           style="max-width:400px">
+    <button type="submit" class="btn btn-primary">
+      <i class="fa-solid fa-magnifying-glass me-1"></i>Buscar
+    </button>
+    <a th:if="${nombre != null and !#strings.isEmpty(nombre)}"
+       th:href="@{/catalogo}"
+       class="btn btn-outline-secondary">
+      <i class="fa-solid fa-xmark me-1"></i>Limpiar
+    </a>
+  </form>
+
+  <div th:if="${#lists.isEmpty(tiposMueble)}" class="text-center py-5" style="color:var(--co-text-muted)">
+    Aún no hay tipos de mueble disponibles. Vuelve pronto.
+  </div>
+
+  <div class="row row-cols-sm-1 row-cols-2 row-cols-md-3 row-cols-lg-4 g-5">
+    <div class="col" th:each="tipo : ${tiposMueble}">
+      <div class="card h-100 shadow-sm" style="border:1px solid var(--co-border);border-radius:12px">
+        <img th:if="${tipo.fotoUrl != null and !tipo.fotoUrl.isEmpty()}"
+             th:src="${tipo.fotoUrl}"
+             class="card-img-top"
+             style="height:200px;object-fit:cover;border-radius:12px 12px 0 0"
+             th:alt="${tipo.nombre}">
+        <div th:unless="${tipo.fotoUrl != null and !tipo.fotoUrl.isEmpty()}"
+             class="d-flex align-items-center justify-content-center"
+             style="height:200px;background:var(--co-bg-card);border-radius:12px 12px 0 0">
+          <i class="fa-solid fa-couch fa-3x" style="color:var(--co-text-muted)"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title fw-bold" style="color:var(--co-text-primary)" th:text="${tipo.nombre}">Nombre</h5>
+          <p class="card-text small" style="color:var(--co-text-secondary)" th:text="${tipo.descripcion}">Descripción</p>
+        </div>
+        <div class="card-footer bg-transparent" style="border-top:1px solid var(--co-border)">
+          <a th:href="@{/cotizar}" class="btn btn-primary w-100">Solicitar cotización</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:replace="~{fragmentos/paginacion :: controles(
+      ${pagina},
+      '/catalogo',
+      ${nombre != null and !#strings.isEmpty(nombre) ? 'nombre=' + nombre : ''}
+  )}"></div>
+
+</div>
+</body>
+</html>

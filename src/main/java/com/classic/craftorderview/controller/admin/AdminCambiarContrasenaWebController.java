@@ -1,5 +1,7 @@
 package com.classic.craftorderview.controller.admin;
 
+import com.classic.craftorderview.constantes.ModelAtributos;
+import com.classic.craftorderview.constantes.Vistas;
 import com.classic.craftorderview.model.dto.request.CambiarContrasenaRequestDTO;
 import com.classic.craftorderview.services.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
@@ -27,8 +29,8 @@ public class AdminCambiarContrasenaWebController {
             return redireccion;
         }
 
-        model.addAttribute("tituloPagina", "Cambiar contraseña");
-        return "admin/cuenta/cambiar-contrasena";
+        model.addAttribute(ModelAtributos.TITULO_PAGINA, "Cambiar contraseña");
+        return Vistas.ADMIN_CAMBIAR_CONTRASENA;
     }
 
     @PostMapping
@@ -40,19 +42,19 @@ public class AdminCambiarContrasenaWebController {
         }
 
         try {
-            Long usuarioId = (Long) session.getAttribute("usuarioId");
+            Long usuarioId = (Long) session.getAttribute(ModelAtributos.SESSION_USUARIO_ID);
             usuarioService.cambiarContrasena(usuarioId, dto);
-            session.setAttribute("mensajeExito", "Contraseña actualizada correctamente");
+            session.setAttribute(ModelAtributos.MENSAJE_EXITO, "Contraseña actualizada correctamente");
             return "redirect:/admin/dashboard";
         } catch (Exception e) {
-            model.addAttribute("tituloPagina", "Cambiar contraseña");
+            model.addAttribute(ModelAtributos.TITULO_PAGINA, "Cambiar contraseña");
             model.addAttribute("error", e.getMessage());
-            return "admin/cuenta/cambiar-contrasena";
+            return Vistas.ADMIN_CAMBIAR_CONTRASENA;
         }
     }
 
     private String verificarSesion(HttpSession session, String rolRequerido) {
-        String rol = (String) session.getAttribute("usuarioRol");
+        String rol = (String) session.getAttribute(ModelAtributos.SESSION_USUARIO_ROL);
         if (rol == null) {
             return "redirect:/login";
         }
