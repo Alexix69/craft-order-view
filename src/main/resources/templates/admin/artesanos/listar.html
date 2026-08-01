@@ -18,7 +18,54 @@
     </button>
   </div>
 
-  <div th:if="${errorArtesano}" class="alert alert-danger" th:text="${errorArtesano}"></div>
+  <form th:action="@{/admin/artesanos}" method="get"
+        class="d-flex flex-wrap gap-2 mb-3 align-items-end">
+
+    <!-- Campo de búsqueda texto -->
+    <div>
+      <label class="form-label small mb-1">Buscar</label>
+      <input type="text"
+             class="form-control form-control-sm"
+             name="busqueda"
+             th:value="${busqueda}"
+             placeholder="Nombre o correo..."
+             style="min-width:200px">
+    </div>
+
+    <!-- Campo de búsqueda selector -->
+    <div>
+      <label class="form-label small mb-1">Buscar por</label>
+      <select class="form-select form-select-sm" name="campoBusqueda"
+              style="min-width:120px">
+        <option value="nombre"
+                th:selected="${campoBusqueda == 'nombre' or campoBusqueda == ''}">
+          Nombre
+        </option>
+        <option value="correo"
+                th:selected="${campoBusqueda == 'correo'}">
+          Correo
+        </option>
+      </select>
+    </div>
+
+    <!-- Filtro por estado -->
+    <div>
+      <label class="form-label small mb-1">Estado</label>
+      <select class="form-select form-select-sm" name="activo"
+              style="min-width:120px">
+        <option value="" th:selected="${activo == null}">Todos</option>
+        <option value="true" th:selected="${activo == true}">Activo</option>
+        <option value="false" th:selected="${activo == false}">Inactivo</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-sm btn-outline-secondary">
+      <i class="fa-solid fa-magnifying-glass me-1"></i>Buscar
+    </button>
+    <a th:href="@{/admin/artesanos}" class="btn btn-sm btn-outline-danger">
+      <i class="fa-solid fa-xmark me-1"></i>Limpiar
+    </a>
+  </form>
 
   <div class="card">
     <div class="table-responsive">
@@ -66,6 +113,14 @@
     </div>
   </div>
 
+  <div th:replace="~{fragmentos/paginacion :: controles(
+      ${pagina},
+      '/admin/artesanos',
+      ${'busqueda=' + (busqueda != null ? busqueda : '') +
+        '&campoBusqueda=' + (campoBusqueda != null ? campoBusqueda : 'nombre') +
+        (activo != null ? '&activo=' + activo : '')}
+  )}"></div>
+
   <!-- Modal: nuevo artesano -->
   <div class="modal fade" id="modalNuevo" tabindex="-1"
        aria-labelledby="modalNuevoLabel" aria-hidden="true">
@@ -78,22 +133,28 @@
         </div>
         <form th:action="@{/admin/artesanos}" th:object="${artesano}" method="post" id="formNuevoArtesano">
           <div class="modal-body">
+            <div th:if="${errorModal != null}"
+                 class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+              <i class="fa-solid fa-circle-exclamation me-2"></i>
+              <span th:text="${errorModal}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
+              <label for="nombre" class="form-label required-label">Nombre</label>
               <input type="text" class="form-control" id="nombre"
                      th:field="*{nombre}" required minlength="2" maxlength="100"
                      data-mensaje-error="El nombre debe tener entre 2 y 100 caracteres">
               <div class="invalid-feedback">El nombre debe tener entre 2 y 100 caracteres</div>
             </div>
             <div class="mb-3">
-              <label for="correo" class="form-label">Correo</label>
+              <label for="correo" class="form-label required-label">Correo</label>
               <input type="email" class="form-control" id="correo"
                      th:field="*{correo}" required
                      data-mensaje-error="Ingresa un correo electrónico válido">
               <div class="invalid-feedback">Ingresa un correo electrónico válido</div>
             </div>
             <div class="mb-3">
-              <label for="contrasena" class="form-label">Contraseña</label>
+              <label for="contrasena" class="form-label required-label">Contraseña</label>
               <div class="input-group">
                 <input type="password" class="form-control" id="contrasena"
                        th:field="*{contrasena}" required minlength="6"
@@ -171,10 +232,18 @@
 
   <div th:if="${contrasenaTemporal != null}">
     <script th:inline="javascript">
-      window.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('spanContrasenaTemporal').textContent = /*[[${contrasenaTemporal}]]*/ '';
         document.getElementById('spanArtesanoReseteado').textContent = /*[[${artesanoReseteado}]]*/ '';
         new bootstrap.Modal(document.getElementById('modalContrasenaTemporal')).show();
+      });
+    </script>
+  </div>
+
+  <div th:if="${abrirModal}">
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        new bootstrap.Modal(document.getElementById('modalNuevo')).show();
       });
     </script>
   </div>

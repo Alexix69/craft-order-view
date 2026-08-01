@@ -1,7 +1,10 @@
 package com.classic.craftorderview.controller.admin;
 
+import com.classic.craftorderview.constantes.ModelAtributos;
+import com.classic.craftorderview.constantes.Vistas;
 import com.classic.craftorderview.model.dto.request.UsuarioRequestDTO;
 import com.classic.craftorderview.model.dto.response.ContrasenaTemporalResponseDTO;
+import com.classic.craftorderview.model.dto.response.PaginaResponseDTO;
 import com.classic.craftorderview.model.dto.response.UsuarioResponseDTO;
 import com.classic.craftorderview.services.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
@@ -12,8 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/admin/artesanos")
@@ -26,24 +28,29 @@ public class ArtesanoWebController {
     }
 
     @GetMapping
-    public String listar(Model model, HttpSession session) {
+    public String listar(
+            @RequestParam(defaultValue = "") String busqueda,
+            @RequestParam(defaultValue = "") String campoBusqueda,
+            @RequestParam(required = false) Boolean activo,
+            @RequestParam(defaultValue = "0") int page,
+            Model model, HttpSession session) {
         String redireccion = verificarSesion(session, "ADMIN");
         if (redireccion != null) {
             return redireccion;
         }
 
-        model.addAttribute("tituloPagina", "Artesanos");
-        List<UsuarioResponseDTO> artesanos = usuarioService.listarPorRol("ARTESANO");
-        model.addAttribute("artesanos", artesanos);
+        PaginaResponseDTO<UsuarioResponseDTO> pagina =
+                usuarioService.listarArtesanosPaginado(busqueda, campoBusqueda, activo, page);
+
+        model.addAttribute(ModelAtributos.TITULO_PAGINA, "Artesanos");
+        model.addAttribute("artesanos", pagina.getContenido());
+        model.addAttribute(ModelAtributos.PAGINA, pagina);
+        model.addAttribute("busqueda", busqueda);
+        model.addAttribute("campoBusqueda", campoBusqueda);
+        model.addAttribute("activo", activo);
         UsuarioRequestDTO nuevo = new UsuarioRequestDTO();
         nuevo.setRol("ARTESANO");
         model.addAttribute("artesano", nuevo);
-
-        Object errorArtesano = session.getAttribute("errorArtesano");
-        if (errorArtesano != null) {
-            model.addAttribute("errorArtesano", errorArtesano);
-            session.removeAttribute("errorArtesano");
-        }
 
         Object contrasenaTemporal = session.getAttribute("contrasenaTemporal");
         if (contrasenaTemporal != null) {
@@ -53,11 +60,11 @@ public class ArtesanoWebController {
             session.removeAttribute("artesanoReseteado");
         }
 
-        return "admin/artesanos/listar";
+        return Vistas.ADMIN_ARTESANOS;
     }
 
     @PostMapping
-    public String crear(@ModelAttribute UsuarioRequestDTO artesano, HttpSession session) {
+    public String crear(@ModelAttribute UsuarioRequestDTO artesano, Model model, HttpSession session) {
         String redireccion = verificarSesion(session, "ADMIN");
         if (redireccion != null) {
             return redireccion;
@@ -65,10 +72,21 @@ public class ArtesanoWebController {
 
         try {
             usuarioService.crear(artesano);
+            return "redirect:/admin/artesanos";
         } catch (Exception e) {
-            session.setAttribute("errorArtesano", e.getMessage());
+            PaginaResponseDTO<UsuarioResponseDTO> pagina =
+                    usuarioService.listarArtesanosPaginado("", "", null, 0);
+            model.addAttribute(ModelAtributos.TITULO_PAGINA, "Artesanos");
+            model.addAttribute("artesanos", pagina.getContenido());
+            model.addAttribute(ModelAtributos.PAGINA, pagina);
+            model.addAttribute("busqueda", "");
+            model.addAttribute("campoBusqueda", "");
+            model.addAttribute("activo", (Boolean) null);
+            model.addAttribute("artesano", artesano);
+            model.addAttribute(ModelAtributos.ERROR_MODAL, e.getMessage());
+            model.addAttribute(ModelAtributos.ABRIR_MODAL, true);
+            return Vistas.ADMIN_ARTESANOS;
         }
-        return "redirect:/admin/artesanos";
     }
 
     @PostMapping("/{id}/desactivar")
@@ -101,11 +119,7 @@ public class ArtesanoWebController {
         }
 
         ContrasenaTemporalResponseDTO resp = usuarioService.resetearContrasena(id);
-        String nombreArtesano = usuarioService.listarPorRol("ARTESANO").stream()
-                .filter(a -> a.getId().equals(id))
-                .map(UsuarioResponseDTO::getNombre)
-                .findFirst()
-                .orElse("");
+        String nombreArtesano = usuarioService.buscarPorId(id).getNombre();
 
         session.setAttribute("contrasenaTemporal", resp.getContrasenaTemporal());
         session.setAttribute("artesanoReseteado", nombreArtesano);
@@ -113,7 +127,7 @@ public class ArtesanoWebController {
     }
 
     private String verificarSesion(HttpSession session, String rolRequerido) {
-        String rol = (String) session.getAttribute("usuarioRol");
+        String rol = (String) session.getAttribute(ModelAtributos.SESSION_USUARIO_ROL);
         if (rol == null) {
             return "redirect:/login";
         }

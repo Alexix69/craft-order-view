@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="controles(pagina, urlBase, params)"
+     th:if="${pagina.totalPaginas > 1}"
+     class="d-flex align-items-center justify-content-between mt-3">
+
+  <!-- Info -->
+  <small class="text-muted">
+    Página <span th:text="${pagina.paginaActual + 1}">1</span>
+    de <span th:text="${pagina.totalPaginas}">1</span>
+    — <span th:text="${pagina.totalElementos}">0</span> registros
+  </small>
+
+  <!-- Navegación -->
+  <nav>
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item" th:classappend="${pagina.esPrimera} ? 'disabled'">
+        <a class="page-link"
+           th:href="${urlBase + '?page=' + (pagina.paginaActual - 1) +
+                     (params != null and !#strings.isEmpty(params) ?
+                      '&' + params : '')}">
+          <i class="fa-solid fa-chevron-left"></i>
+        </a>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link"
+              th:text="${pagina.paginaActual + 1} + ' / ' + ${pagina.totalPaginas}">
+        </span>
+      </li>
+      <li class="page-item" th:classappend="${pagina.esUltima} ? 'disabled'">
+        <a class="page-link"
+           th:href="${urlBase + '?page=' + (pagina.paginaActual + 1) +
+                     (params != null and !#strings.isEmpty(params) ?
+                      '&' + params : '')}">
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+</body>
+</html>

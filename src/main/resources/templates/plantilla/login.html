@@ -29,14 +29,14 @@
 
       <form th:action="@{/login}" method="post">
         <div class="mb-3">
-          <label for="correo" class="form-label">Correo</label>
+          <label for="correo" class="form-label required-label">Correo</label>
           <input type="email" class="form-control" id="correo"
                  name="correo" required autofocus
                  data-mensaje-error="Ingresa un correo electrónico válido">
           <div class="invalid-feedback">Ingresa un correo electrónico válido</div>
         </div>
         <div class="mb-3">
-          <label for="contrasena" class="form-label">Contraseña</label>
+          <label for="contrasena" class="form-label required-label">Contraseña</label>
           <div class="input-group">
             <input type="password" class="form-control" id="contrasena"
                    name="contrasena" required minlength="6"
