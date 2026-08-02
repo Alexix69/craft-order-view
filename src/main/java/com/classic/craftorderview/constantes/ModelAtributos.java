@@ -12,6 +12,9 @@ public final class ModelAtributos {
     public static final String MENSAJE_EXITO = "mensajeExito";
     public static final String PAGINA = "pagina";
     public static final String NOMBRE_FILTRO = "nombre";
+    public static final String COTIZACION = "cotizacion";
+    public static final String ESTADO = "estado";
+    public static final String ERROR = "error";
 
     // Sesión
     public static final String SESSION_USUARIO_ID = "usuarioId";

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{plantilla/base-admin}">
+
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body>
+
+  <div layout:fragment="contenidopaginas">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <a th:href="@{/admin/cotizaciones(estado=${cotizacion.estado})}" class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i>Volver
+      </a>
+      <h1 class="h4 fw-bold mb-0" style="color:var(--co-text-primary)">Detalle de cotización</h1>
+    </div>
+
+    <!-- Alerta de error -->
+    <div th:if="${errorModal != null}" class="alert alert-danger alert-dismissible fade show mb-4">
+      <i class="fa-solid fa-circle-exclamation me-2"></i>
+      <span th:text="${errorModal}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Datos del cliente -->
+      <div class="col-md-6">
+        <div class="card p-4 h-100" style="border:1px solid var(--co-border);border-radius:10px">
+          <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+            DATOS DEL CLIENTE
+          </h6>
+          <dl class="row mb-0" style="color:var(--co-text-primary)">
+            <dt class="col-sm-5">Nombre</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.nombreCliente}"></dd>
+            <dt class="col-sm-5">Correo</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.correoCliente}"></dd>
+            <dt class="col-sm-5">Teléfono</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.telefonoCliente}"></dd>
+            <dt class="col-sm-5">Fecha</dt>
+            <dd class="col-sm-7" th:text="${#temporals.format(cotizacion.createdAt,
+                         'dd/MM/yyyy HH:mm')}"></dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Configuración del mueble -->
+      <div class="col-md-6">
+        <div class="card p-4 h-100" style="border:1px solid var(--co-border);border-radius:10px">
+          <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+            CONFIGURACIÓN DEL MUEBLE
+          </h6>
+          <dl class="row mb-0" style="color:var(--co-text-primary)">
+            <dt class="col-sm-5">Tipo</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.tipoMuebleNombre}"></dd>
+            <dt class="col-sm-5">Material</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.materialNombre}"></dd>
+            <dt class="col-sm-5">Acabado</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.tipoAcabado}"></dd>
+            <dt class="col-sm-5">Dimensiones</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.altoCm} + '×' + ${cotizacion.anchoCm}
+                       + '×' + ${cotizacion.profundidadCm} + ' cm'"></dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Desglose del costo -->
+      <div class="col-12">
+        <div class="card p-4" style="border:1px solid var(--co-border);border-radius:10px">
+          <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+            DESGLOSE DEL COSTO
+          </h6>
+          <dl class="row mb-0" style="color:var(--co-text-primary)">
+            <dt class="col-sm-4">Precio material (snap)</dt>
+            <dd class="col-sm-8" th:text="'$' + ${#numbers.formatDecimal(
+                cotizacion.precioMaterialSnap,1,'COMMA',2,'POINT')}
+                + ' /m³'"></dd>
+            <dt class="col-sm-4">Costo M.O. base (snap)</dt>
+            <dd class="col-sm-8" th:text="'$' + ${#numbers.formatDecimal(
+                cotizacion.costoBaseMoSnap,1,'COMMA',2,'POINT')}"></dd>
+            <dt class="col-sm-4">% Acabado (snap)</dt>
+            <dd class="col-sm-8" th:text="${cotizacion.porcentajeAcabadoSnap} + '%'"></dd>
+            <dt class="col-sm-4 fw-bold">Costo estimado</dt>
+            <dd class="col-sm-8 fw-bold" style="color:var(--co-primary)" th:text="'$' + ${#numbers.formatDecimal(
+                cotizacion.costoEstimado,1,'COMMA',2,'POINT')}"></dd>
+            <dt th:if="${cotizacion.costoAprobado != null}" class="col-sm-4">
+              Costo aprobado
+            </dt>
+            <dd th:if="${cotizacion.costoAprobado != null}" class="col-sm-8 fw-bold" style="color:green" th:text="'$' + ${#numbers.formatDecimal(
+                cotizacion.costoAprobado,1,'COMMA',2,'POINT')}"></dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Motivo de rechazo (solo si RECHAZADA) -->
+      <div th:if="${cotizacion.estado == 'RECHAZADA'}" class="col-12">
+        <div class="alert alert-danger">
+          <strong>Motivo de rechazo:</strong>
+          <span th:text="${cotizacion.motivoRechazo}"></span>
+        </div>
+      </div>
+
+      <!-- Acciones (solo si PENDIENTE) -->
+      <div th:if="${cotizacion.estado == 'PENDIENTE'}" class="col-12">
+        <div class="card p-4" style="border:1px solid var(--co-border);border-radius:10px">
+          <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+            ACCIONES
+          </h6>
+          <div class="row g-3">
+
+            <!-- Aprobar -->
+            <div class="col-md-6">
+              <form th:action="@{/admin/cotizaciones/{id}/aprobar(id=${cotizacion.id})}" method="post">
+                <label class="form-label required-label">
+                  Costo aprobado ($)
+                </label>
+                <input type="number" class="form-control mb-2" name="costoAprobado" step="0.01" min="0.01"
+                  th:value="${costoSugerido}" required>
+                <small class="text-muted d-block mb-3">
+                  El costo estimado es $<span th:text="${#numbers.formatDecimal(
+                    cotizacion.costoEstimado,1,'COMMA',2,'POINT')}">
+                  </span>. Puedes ajustarlo antes de aprobar.
+                </small>
+                <button type="submit" class="btn btn-success w-100">
+                  <i class="fa-solid fa-check me-1"></i>Aprobar cotización
+                </button>
+              </form>
+            </div>
+
+            <!-- Rechazar -->
+            <div class="col-md-6">
+              <form id="formRechazo" th:action="@{/admin/cotizaciones/{id}/rechazar(id=${cotizacion.id})}"
+                method="post">
+                <label class="form-label required-label">
+                  Motivo de rechazo
+                </label>
+                <textarea class="form-control mb-3" id="motivoRechazo" name="motivoRechazo" rows="3" required
+                  placeholder="Explica al cliente por qué no se puede procesar su cotización..."
+                  data-mensaje-error="El motivo de rechazo es obligatorio">
+              </textarea>
+                <div class="invalid-feedback">
+                  El motivo de rechazo es obligatorio
+                </div>
+                <button type="button" class="btn btn-danger w-100" id="btnRechazar" onclick="prepararRechazo()">
+                  <i class="fa-solid fa-xmark me-1"></i>Rechazar cotización
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal: confirmación reutilizable -->
+    <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalConfirmarTitulo">Confirmar acción</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p id="modalConfirmarCuerpo" class="mb-0">¿Confirmar esta acción?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form id="formConfirmar" action="" method="post" class="d-inline">
+              <button type="submit" class="btn btn-danger">Confirmar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:inline="javascript">
+      document.addEventListener('DOMContentLoaded', function () {
+        initValidacionInline();
+      });
+
+      function prepararRechazo() {
+        var textarea = document.getElementById('motivoRechazo');
+        var motivo = textarea.value.trim();
+        if (!motivo) {
+          textarea.classList.add('is-invalid');
+          return;
+        }
+        document.getElementById('modalConfirmarTitulo').textContent =
+          'Rechazar cotización';
+        document.getElementById('modalConfirmarCuerpo').textContent =
+          '¿Confirmas el rechazo de esta cotización? Esta acción notificará al cliente por correo.';
+        document.getElementById('formConfirmar').onsubmit = function (e) {
+          e.preventDefault();
+          document.getElementById('formRechazo').submit();
+        };
+        new bootstrap.Modal(document.getElementById('modalConfirmar')).show();
+      }
+    </script>
+
+  </div>
+
+</body>
+
+</html>
