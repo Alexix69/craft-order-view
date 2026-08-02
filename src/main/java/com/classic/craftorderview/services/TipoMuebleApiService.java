@@ -56,6 +56,10 @@ public class TipoMuebleApiService {
         }
     }
 
+    public List<TipoMuebleResponseDTO> listarActivos() {
+        return listarActivosPaginado("", 0).getContenido();
+    }
+
     public List<String> listarUrlsActivas() {
         PaginaResponseDTO<TipoMuebleResponseDTO> pagina = listarActivosPaginado("", 0);
         return pagina.getContenido().stream()

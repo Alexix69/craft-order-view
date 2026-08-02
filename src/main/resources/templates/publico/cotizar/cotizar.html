@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-publico}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+<div layout:fragment="contenido">
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <h2 class="h4 fw-bold mb-1" style="color:var(--co-text-primary)">Configura tu mueble</h2>
+      <p class="small mb-4" style="color:var(--co-text-secondary)">
+        Completa el formulario para recibir una cotización personalizada.
+      </p>
+
+      <div th:if="${errorModal != null}"
+           class="alert alert-danger alert-dismissible fade show mb-4">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
+        <span th:text="${errorModal}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <form th:action="@{/cotizar}" method="post" id="formCotizar"
+            class="card p-4" style="border:1px solid var(--co-border);border-radius:12px">
+
+        <h5 class="fw-semibold mb-3" style="color:var(--co-text-primary)">
+          Tus datos
+        </h5>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-12">
+            <label for="nombreCliente" class="form-label required-label">
+              Nombre completo
+            </label>
+            <input type="text" class="form-control" id="nombreCliente"
+                   name="nombreCliente"
+                   th:value="${datosPrevios != null ? datosPrevios.nombreCliente : ''}"
+                   required minlength="2" maxlength="120"
+                   data-mensaje-error="Ingresa tu nombre completo">
+            <div class="invalid-feedback">Ingresa tu nombre completo</div>
+          </div>
+          <div class="col-md-6">
+            <label for="correoCliente" class="form-label required-label">
+              Correo electrónico
+            </label>
+            <input type="email" class="form-control" id="correoCliente"
+                   name="correoCliente"
+                   th:value="${datosPrevios != null ? datosPrevios.correoCliente : ''}"
+                   required
+                   data-mensaje-error="Ingresa un correo válido">
+            <div class="invalid-feedback">Ingresa un correo válido</div>
+          </div>
+          <div class="col-md-6">
+            <label for="telefonoCliente" class="form-label required-label">
+              Teléfono
+            </label>
+            <div class="input-group has-validation">
+              <span class="input-group-text">🇪🇨 +593</span>
+              <input type="tel"
+                     class="form-control"
+                     id="telefonoCliente"
+                     name="telefonoCliente"
+                     th:value="${datosPrevios != null ? datosPrevios.telefonoCliente : ''}"
+                     required
+                     maxlength="10"
+                     pattern="^0[2-79]\d{7,8}$"
+                     placeholder="0991234567"
+                     data-mensaje-error="Ingresa un número válido (ej: 0991234567)">
+              <div class="invalid-feedback">
+                Ingresa un número válido (ej: 0991234567)
+              </div>
+            </div>
+            <small class="text-muted">Formato: 09XXXXXXXX (celular) o 0X-XXXXXXX (fijo)</small>
+          </div>
+        </div>
+
+        <hr style="border-color:var(--co-border)">
+
+        <h5 class="fw-semibold mb-3 mt-3" style="color:var(--co-text-primary)">
+          Configuración del mueble
+        </h5>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="tipoMuebleId" class="form-label required-label">
+              Tipo de mueble
+            </label>
+            <select class="form-select" id="tipoMuebleId"
+                    name="tipoMuebleId" required
+                    data-mensaje-error="Selecciona un tipo de mueble">
+              <option value="">Selecciona un tipo...</option>
+              <option th:each="tipo : ${tiposMueble}"
+                      th:value="${tipo.id}"
+                      th:text="${tipo.nombre}"
+                      th:selected="${datosPrevios != null
+                          ? tipo.id == datosPrevios.tipoMuebleId
+                          : tipo.id == tipoMuebleIdSeleccionado}">
+              </option>
+            </select>
+            <div class="invalid-feedback">Selecciona un tipo de mueble</div>
+          </div>
+          <div class="col-md-6">
+            <label for="materialId" class="form-label required-label">
+              Material
+            </label>
+            <select class="form-select" id="materialId"
+                    name="materialId" required
+                    data-mensaje-error="Selecciona un material">
+              <option value="">Selecciona un material...</option>
+              <option th:each="mat : ${materiales}"
+                      th:value="${mat.id}"
+                      th:text="${mat.nombre}"
+                      th:selected="${datosPrevios != null
+                          and mat.id == datosPrevios.materialId}">
+              </option>
+            </select>
+            <div class="invalid-feedback">Selecciona un material</div>
+          </div>
+          <div class="col-md-6">
+            <label for="tipoAcabado" class="form-label required-label">
+              Tipo de acabado
+            </label>
+            <select class="form-select" id="tipoAcabado"
+                    name="tipoAcabado" required
+                    data-mensaje-error="Selecciona un tipo de acabado">
+              <option value="">Selecciona un acabado...</option>
+              <option th:each="acabado : ${acabados}"
+                      th:value="${acabado.tipo}"
+                      th:text="${acabado.tipo}"
+                      th:selected="${datosPrevios != null
+                          and acabado.tipo == datosPrevios.tipoAcabado}">
+              </option>
+            </select>
+            <div class="invalid-feedback">Selecciona un tipo de acabado</div>
+          </div>
+        </div>
+
+        <hr style="border-color:var(--co-border)">
+
+        <h5 class="fw-semibold mb-1 mt-3" style="color:var(--co-text-primary)">
+          Dimensiones
+        </h5>
+        <p class="small mb-3" style="color:var(--co-text-secondary)">
+          Ingresa las medidas en centímetros (mínimo 10 cm, máximo 500 cm).
+        </p>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <label for="altoCm" class="form-label required-label">Alto (cm)</label>
+            <input type="number" class="form-control" id="altoCm"
+                   name="altoCm"
+                   th:value="${datosPrevios != null ? datosPrevios.altoCm : ''}"
+                   step="0.01" min="10" max="500" required
+                   data-mensaje-error="Alto debe estar entre 10 y 500 cm">
+            <div class="invalid-feedback">Alto debe estar entre 10 y 500 cm</div>
+          </div>
+          <div class="col-md-4">
+            <label for="anchoCm" class="form-label required-label">Ancho (cm)</label>
+            <input type="number" class="form-control" id="anchoCm"
+                   name="anchoCm"
+                   th:value="${datosPrevios != null ? datosPrevios.anchoCm : ''}"
+                   step="0.01" min="10" max="500" required
+                   data-mensaje-error="Ancho debe estar entre 10 y 500 cm">
+            <div class="invalid-feedback">Ancho debe estar entre 10 y 500 cm</div>
+          </div>
+          <div class="col-md-4">
+            <label for="profundidadCm" class="form-label required-label">
+              Profundidad (cm)
+            </label>
+            <input type="number" class="form-control" id="profundidadCm"
+                   name="profundidadCm"
+                   th:value="${datosPrevios != null ? datosPrevios.profundidadCm : ''}"
+                   step="0.01" min="10" max="500" required
+                   data-mensaje-error="Profundidad debe estar entre 10 y 500 cm">
+            <div class="invalid-feedback">
+              Profundidad debe estar entre 10 y 500 cm
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <a th:href="@{/catalogo}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>Volver al catálogo
+          </a>
+          <button type="submit" class="btn btn-primary px-4">
+            Ver cotización estimada
+            <i class="fa-solid fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      initValidacionInline();
+    });
+  </script>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-publico}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+<div layout:fragment="contenido">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 text-center">
+
+      <div class="mb-4">
+        <i class="fa-solid fa-circle-check fa-4x"
+           style="color:var(--co-primary)"></i>
+      </div>
+
+      <h2 class="h4 fw-bold mb-2" style="color:var(--co-text-primary)">¡Cotización enviada!</h2>
+      <p class="mb-4" style="color:var(--co-text-secondary)">
+        Hemos recibido tu solicitud. Pronto recibirás una respuesta
+        de nuestro equipo.
+      </p>
+
+      <div class="card p-4 mb-4"
+           style="border:2px solid var(--co-primary);border-radius:12px">
+        <p class="small mb-1" style="color:var(--co-text-secondary)">Tu link de seguimiento</p>
+        <p class="fw-bold small mb-3 text-break"
+           id="linkSeguimientoTexto"
+           th:text="${linkSeguimiento}"
+           style="color:var(--co-primary)">
+        </p>
+        <button type="button"
+                class="btn btn-sm btn-outline-primary"
+                id="btnCopiarLink">
+          <i class="fa-solid fa-copy me-1"></i>Copiar link
+        </button>
+      </div>
+
+      <div class="alert alert-info text-start" role="alert">
+        <i class="fa-solid fa-envelope me-2"></i>
+        Guarda este link de seguimiento — te permitirá consultar
+        el estado de tu cotización en cualquier momento.
+        <br>
+        <small class="text-muted">
+          (El envío por correo estará disponible próximamente)
+        </small>
+      </div>
+
+      <a th:href="@{/catalogo}" class="btn btn-primary">
+        <i class="fa-solid fa-arrow-left me-1"></i>Volver al catálogo
+      </a>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var btnCopiar = document.getElementById('btnCopiarLink');
+      if (btnCopiar) {
+        btnCopiar.addEventListener('click', function () {
+          var link = document.getElementById('linkSeguimientoTexto')
+                             .textContent.trim();
+          navigator.clipboard.writeText(link).then(function () {
+            btnCopiar.innerHTML =
+              '<i class="fa-solid fa-check me-1"></i>¡Copiado!';
+            setTimeout(function () {
+              btnCopiar.innerHTML =
+                '<i class="fa-solid fa-copy me-1"></i>Copiar link';
+            }, 2000);
+          });
+        });
+      }
+    });
+  </script>
+
+</div>
+</body>
+</html>

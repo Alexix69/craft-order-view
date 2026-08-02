@@ -52,6 +52,10 @@ public class MaterialApiService {
         }
     }
 
+    public List<MaterialResponseDTO> listarActivos() {
+        return listarActivosPaginado("", 0).getContenido();
+    }
+
     public MaterialResponseDTO buscarPorId(Long id) {
         try {
             return webClient.get()
