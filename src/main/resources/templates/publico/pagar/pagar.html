@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{plantilla/base-publico}">
+
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body>
+
+  <div layout:fragment="contenido">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+
+        <!-- Estado: APROBADA → formulario de pago -->
+        <div th:if="${cotizacion.estado == 'APROBADA'}">
+          <div class="text-center mb-4">
+            <i class="fa-solid fa-credit-card fa-3x" style="color:var(--co-primary)"></i>
+          </div>
+          <h2 class="h4 fw-bold text-center mb-4" style="color:var(--co-text-primary)">Confirmar pago</h2>
+
+          <div class="card p-4 mb-4" style="border:1px solid var(--co-border);border-radius:12px">
+            <dl class="row mb-0" style="color:var(--co-text-primary)">
+              <dt class="col-sm-5">Cliente</dt>
+              <dd class="col-sm-7" th:text="${cotizacion.nombreCliente}"></dd>
+              <dt class="col-sm-5">Mueble</dt>
+              <dd class="col-sm-7" th:text="${cotizacion.tipoMuebleNombre}"></dd>
+              <dt class="col-sm-5">Material</dt>
+              <dd class="col-sm-7" th:text="${cotizacion.materialNombre}"></dd>
+              <dt class="col-sm-5 fw-bold">Total a pagar</dt>
+              <dd class="col-sm-7 fw-bold fs-5" style="color:var(--co-primary)" th:text="'$' + ${#numbers.formatDecimal(
+                  cotizacion.costoAprobado,1,'COMMA',2,'POINT')}"></dd>
+            </dl>
+          </div>
+
+          <form th:action="@{/pagar/{token}(token=${cotizacion.token})}" method="post">
+            <button type="submit" class="btn btn-primary w-100 py-3 fs-5">
+              <i class="fa-solid fa-lock me-2"></i>Confirmar pago
+            </button>
+          </form>
+          <p class="text-muted small text-center mt-3">
+            Pago simulado — no se realizará ningún cargo real
+          </p>
+        </div>
+
+        <!-- Estado: PAGADA -->
+        <div th:if="${cotizacion.estado == 'PAGADA'}" class="text-center">
+          <i class="fa-solid fa-circle-check fa-3x mb-3" style="color:green"></i>
+          <h2 class="h4 fw-bold mb-3" style="color:var(--co-text-primary)">¡Pago ya registrado!</h2>
+          <p style="color:var(--co-text-secondary)" th:text="${mensajeEstado}"></p>
+          <a th:href="${'/seguimiento/' + cotizacion.token}" class="btn btn-primary">
+            Ver estado de mi orden
+          </a>
+        </div>
+
+        <!-- Estado: PENDIENTE -->
+        <div th:if="${cotizacion.estado == 'PENDIENTE'}" class="text-center">
+          <i class="fa-solid fa-clock fa-3x mb-3" style="color:var(--co-primary)"></i>
+          <h2 class="h4 fw-bold mb-3" style="color:var(--co-text-primary)">Cotización en revisión</h2>
+          <p style="color:var(--co-text-secondary)" th:text="${mensajeEstado}"></p>
+          <a th:href="${'/seguimiento/' + cotizacion.token}" class="btn btn-outline-primary">
+            Ver estado de mi cotización
+          </a>
+        </div>
+
+        <!-- Estado: RECHAZADA -->
+        <div th:if="${cotizacion.estado == 'RECHAZADA'}" class="text-center">
+          <i class="fa-solid fa-circle-xmark fa-3x mb-3" style="color:#dc3545"></i>
+          <h2 class="h4 fw-bold mb-3" style="color:var(--co-text-primary)">Cotización no procesada</h2>
+          <p style="color:var(--co-text-secondary)" th:text="${mensajeEstado}"></p>
+          <a th:href="${'/seguimiento/' + cotizacion.token}" class="btn btn-outline-secondary">
+            Ver detalle
+          </a>
+          <a th:href="@{/catalogo}" class="btn btn-primary ms-2">
+            Solicitar nueva cotización
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

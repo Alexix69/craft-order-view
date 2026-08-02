@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CraftorderviewApplication {
 
 	public static void main(String[] args) {
+		java.util.TimeZone.setDefault(
+			java.util.TimeZone.getTimeZone("America/Guayaquil"));
 		SpringApplication.run(CraftorderviewApplication.class, args);
 	}
 
