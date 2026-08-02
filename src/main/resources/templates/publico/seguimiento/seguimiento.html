@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{plantilla/base-publico}">
+
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body>
+
+  <div layout:fragment="contenido">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <h2 class="h4 fw-bold mb-1" style="color:var(--co-text-primary)">Estado de tu cotización</h2>
+        <p class="text-muted small mb-4">
+          Token: <code th:text="${cotizacion.token}"></code>
+        </p>
+
+        <!-- Badge de estado -->
+        <div class="mb-4">
+          <span th:switch="${cotizacion.estado}">
+            <span th:case="'PENDIENTE'" class="badge bg-warning text-dark fs-6 px-3 py-2">
+              En revisión
+            </span>
+            <span th:case="'APROBADA'" class="badge bg-info text-dark fs-6 px-3 py-2">
+              Aprobada — pendiente de pago
+            </span>
+            <span th:case="'RECHAZADA'" class="badge bg-danger fs-6 px-3 py-2">
+              Rechazada
+            </span>
+            <span th:case="'PAGADA'" class="badge bg-success fs-6 px-3 py-2">
+              Pago recibido — asignando artesano
+            </span>
+          </span>
+        </div>
+
+        <!-- Resumen de configuración -->
+        <div class="card p-4 mb-4" style="border:1px solid var(--co-border);border-radius:10px">
+          <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+            TU CONFIGURACIÓN
+          </h6>
+          <dl class="row mb-0" style="color:var(--co-text-primary)">
+            <dt class="col-sm-5">Tipo de mueble</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.tipoMuebleNombre}"></dd>
+            <dt class="col-sm-5">Material</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.materialNombre}"></dd>
+            <dt class="col-sm-5">Acabado</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.tipoAcabado}"></dd>
+            <dt class="col-sm-5">Dimensiones</dt>
+            <dd class="col-sm-7" th:text="${cotizacion.altoCm} + '×' + ${cotizacion.anchoCm}
+                       + '×' + ${cotizacion.profundidadCm} + ' cm'"></dd>
+            <dt class="col-sm-5">Costo estimado</dt>
+            <dd class="col-sm-7" th:text="'$' + ${#numbers.formatDecimal(
+                cotizacion.costoEstimado,1,'COMMA',2,'POINT')}"></dd>
+            <dt th:if="${cotizacion.costoAprobado != null}" class="col-sm-5">
+              Costo aprobado
+            </dt>
+            <dd th:if="${cotizacion.costoAprobado != null}" class="col-sm-7 fw-bold" th:text="'$' + ${#numbers.formatDecimal(
+                cotizacion.costoAprobado,1,'COMMA',2,'POINT')}"></dd>
+          </dl>
+        </div>
+
+        <!-- Motivo de rechazo -->
+        <div th:if="${cotizacion.estado == 'RECHAZADA'}" class="alert alert-danger mb-4">
+          <strong>Motivo:</strong>
+          <span th:text="${cotizacion.motivoRechazo}"></span>
+        </div>
+
+        <!-- Info: pago recibido, pendiente de asignación de artesano -->
+        <div th:if="${cotizacion.estado == 'PAGADA'}" class="alert alert-info mb-4">
+          <i class="fa-solid fa-clock-rotate-left me-2"></i>
+          Hemos recibido tu pago. Nuestro equipo está asignando un artesano
+          para comenzar la fabricación de tu mueble. Te notificaremos por correo
+          cuando inicie la producción.
+        </div>
+
+        <!-- Acción según estado -->
+        <div class="text-center">
+          <a th:if="${cotizacion.estado == 'APROBADA'}" th:href="${'/pagar/' + cotizacion.token}"
+            class="btn btn-primary px-4">
+            <i class="fa-solid fa-credit-card me-1"></i>Proceder al pago
+          </a>
+          <a th:href="@{/catalogo}" class="btn btn-outline-secondary ms-2">
+            <i class="fa-solid fa-arrow-left me-1"></i>Volver al catálogo
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

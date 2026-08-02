@@ -3,6 +3,7 @@ package com.classic.craftorderview.model.dto.response;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Data
 public class CotizacionResponseDTO {
@@ -11,7 +12,9 @@ public class CotizacionResponseDTO {
     private String correoCliente;
     private String telefonoCliente;
     private Long tipoMuebleId;
+    private String tipoMuebleNombre;
     private Long materialId;
+    private String materialNombre;
     private String tipoAcabado;
     private BigDecimal altoCm;
     private BigDecimal anchoCm;
@@ -22,5 +25,7 @@ public class CotizacionResponseDTO {
     private BigDecimal costoEstimado;
     private BigDecimal costoAprobado;
     private String estado;
+    private String motivoRechazo;
     private String token;
+    private OffsetDateTime createdAt;
 }
