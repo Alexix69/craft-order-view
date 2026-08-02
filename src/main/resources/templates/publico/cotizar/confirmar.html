@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-publico}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+<div layout:fragment="contenido">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+
+      <h2 class="h4 fw-bold mb-1" style="color:var(--co-text-primary)">Confirma tu cotización</h2>
+      <p class="small mb-4" style="color:var(--co-text-secondary)">
+        Revisa los detalles antes de confirmar. Una vez enviada,
+        recibirás un número de seguimiento.
+      </p>
+
+      <div class="card p-4 mb-3"
+           style="border:1px solid var(--co-border);border-radius:12px">
+
+        <div th:if="${fotoMueble != null and !#strings.isEmpty(fotoMueble)}"
+             class="text-center mb-4">
+          <img th:src="${fotoMueble}"
+               th:alt="${nombreMueble}"
+               class="rounded"
+               style="width:100%;max-height:200px;object-fit:cover;
+                      border-radius:10px">
+          <p class="small text-muted mt-2 mb-0" th:text="${nombreMueble}"></p>
+        </div>
+
+        <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+          TUS DATOS
+        </h6>
+        <dl class="row mb-4">
+          <dt class="col-sm-4">Nombre</dt>
+          <dd class="col-sm-8" th:text="${cotizacion.nombreCliente}"></dd>
+          <dt class="col-sm-4">Correo</dt>
+          <dd class="col-sm-8" th:text="${cotizacion.correoCliente}"></dd>
+          <dt class="col-sm-4">Teléfono</dt>
+          <dd class="col-sm-8" th:text="${cotizacion.telefonoCliente}"></dd>
+        </dl>
+
+        <hr style="border-color:var(--co-border)">
+
+        <h6 class="fw-semibold mb-3 mt-3" style="color:var(--co-text-secondary)">
+          CONFIGURACIÓN DEL MUEBLE
+        </h6>
+        <dl class="row mb-4">
+          <dt class="col-sm-4">Acabado</dt>
+          <dd class="col-sm-8" th:text="${cotizacion.tipoAcabado}"></dd>
+          <dt class="col-sm-4">Alto</dt>
+          <dd class="col-sm-8" th:text="${cotizacion.altoCm} + ' cm'"></dd>
+          <dt class="col-sm-4">Ancho</dt>
+          <dd class="col-sm-8" th:text="${cotizacion.anchoCm} + ' cm'"></dd>
+          <dt class="col-sm-4">Profundidad</dt>
+          <dd class="col-sm-8" th:text="${cotizacion.profundidadCm} + ' cm'"></dd>
+        </dl>
+
+        <hr style="border-color:var(--co-border)">
+
+        <div class="text-center py-3">
+          <p class="small mb-1" style="color:var(--co-text-secondary)">Costo estimado</p>
+          <p class="display-6 fw-bold" style="color:var(--co-primary)"
+             th:text="'$' + ${#numbers.formatDecimal(cotizacion.costoEstimado,1,'COMMA',2,'POINT')}">
+          </p>
+          <p class="small" style="color:var(--co-text-secondary)">
+            Este valor puede ajustarse cuando el administrador apruebe tu solicitud.
+          </p>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <a th:href="@{/cotizar}" class="btn btn-outline-secondary">
+          <i class="fa-solid fa-pen me-1"></i>Modificar
+        </a>
+        <form th:action="@{/cotizar/confirmar}" method="post">
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="fa-solid fa-paper-plane me-1"></i>Confirmar y enviar
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
