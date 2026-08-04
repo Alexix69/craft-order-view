@@ -25,6 +25,10 @@ public final class Vistas {
     public static final String ADMIN_COTIZACIONES = "admin/cotizaciones/listar";
     public static final String ADMIN_COTIZACION_DETALLE = "admin/cotizaciones/detalle";
 
+    public static final String ADMIN_KANBAN = "admin/kanban/kanban";
+    public static final String ADMIN_KANBAN_DETALLE = "admin/kanban/detalle";
+
     // Artesano
-    public static final String ARTESANO_TABLERO = "artesano/tablero/tablero";
+    public static final String ARTESANO_KANBAN = "artesano/kanban/kanban";
+    public static final String ARTESANO_KANBAN_DETALLE = "artesano/kanban/detalle";
 }

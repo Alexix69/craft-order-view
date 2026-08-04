@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Fragmento de tarjeta Kanban reutilizable.
+  Parámetros:
+    - orden: OrdenProduccionResponseDTO
+    - rol: "ADMIN" o "ARTESANO"
+    - urlDetalle: ruta al detalle según rol
+-->
+<div th:fragment="tarjeta(orden, rol, urlDetalle)"
+     class="kanban-tarjeta card mb-2 shadow-sm"
+     th:attr="draggable=${orden.estadoActual != 'LISTO_ENTREGA' ? 'true' : 'false'},
+              data-orden-id=${orden.id},
+              data-etapa=${orden.estadoActual},
+              data-busqueda=${#strings.toLowerCase(
+                  (orden.nombreCliente ?: '') + ' ' +
+                  (orden.tipoMuebleNombre ?: '') + ' ' +
+                  (orden.artesanoNombre ?: ''))},
+              data-fecha=${orden.fechaInicio != null ?
+                  orden.fechaInicio.toString() : ''}"
+     style="cursor:grab;border-left:4px solid var(--co-primary);
+            border-radius:8px">
+  <div class="card-body p-3">
+
+    <!-- Encabezado: nombre como enlace + ícono de flecha -->
+    <div class="d-flex justify-content-between align-items-start mb-1">
+      <a th:href="${urlDetalle + '/' + orden.id}"
+         class="fw-bold small text-decoration-none"
+         style="color:var(--co-primary)"
+         th:text="${orden.tipoMuebleNombre}">
+        Tipo mueble
+      </a>
+      <a th:href="${urlDetalle + '/' + orden.id}"
+         class="ms-2 flex-shrink-0"
+         style="color:var(--co-text-muted)"
+         title="Ver detalle">
+        <i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i>
+      </a>
+    </div>
+
+    <!-- Datos del mueble -->
+    <p class="mb-1 small" style="color:var(--co-text-secondary)"
+       th:text="${orden.materialNombre} + ' · ' + ${orden.tipoAcabado}">
+    </p>
+    <p class="mb-1 small" style="color:var(--co-text-muted)"
+       th:text="${orden.altoCm} + '×' + ${orden.anchoCm}
+                + '×' + ${orden.profundidadCm} + ' cm'">
+    </p>
+
+    <!-- Artesano (solo para admin) -->
+    <p class="mb-1 small" style="color:var(--co-text-muted)"
+       th:if="${rol == 'ADMIN'}"
+       th:text="'👤 ' + ${orden.artesanoNombre}">
+    </p>
+
+    <!-- Fecha de entrada al carril actual -->
+    <p class="mb-0 small" style="color:var(--co-text-muted)"
+       th:text="'📅 ' + ${#temporals.format(orden.fechaInicio,
+                           'dd/MM/yyyy HH:mm')}">
+    </p>
+
+  </div>
+</div>
+
+</body>
+</html>

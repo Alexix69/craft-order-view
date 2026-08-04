@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{plantilla/base-artesano}">
+
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body>
+
+<div layout:fragment="contenido">
+
+  <!-- Spinner overlay -->
+  <div id="kanbanSpinner"
+       class="d-none position-fixed top-0 start-0 w-100 h-100
+              d-flex align-items-center justify-content-center"
+       style="background:rgba(0,0,0,0.5);z-index:9999">
+    <div class="spinner-border text-light"
+         style="width:3rem;height:3rem"></div>
+  </div>
+
+  <!-- Toast de error -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index:9999">
+    <div id="kanbanToastError" class="toast align-items-center
+         text-bg-danger border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body" id="kanbanToastMensaje"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <h1 class="h4 fw-bold mb-4">Mi tablero</h1>
+
+  <div th:if="${#lists.isEmpty(ordenes)}"
+       class="card text-center py-5"
+       style="background:var(--co-bg-card);border:1px solid var(--co-border);border-radius:12px">
+    <div class="card-body">
+      <i class="fa-solid fa-screwdriver-wrench fa-3x mb-3" style="color:var(--co-primary)"></i>
+      <p class="mb-0" style="color:var(--co-text-secondary)">
+        No tienes órdenes asignadas en este momento.
+      </p>
+    </div>
+  </div>
+
+  <!-- Tablero Kanban -->
+  <div th:unless="${#lists.isEmpty(ordenes)}"
+       class="kanban-board"
+       id="kanban"
+       th:attr="data-rol='ARTESANO',data-usuario-id=${session.usuarioId}">
+
+    <!-- Columnas del artesano -->
+    <div th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
+                               'ACABADOS','CONTROL_CALIDAD','LISTO_ENTREGA'} }"
+         class="kanban-columna"
+         th:attr="data-etapa=${etapa}">
+
+      <div class="fw-semibold small mb-2 px-2 py-1 rounded"
+           style="background:var(--co-bg-card)"
+           th:text="${etapa == 'ASIGNADO' ? 'Por hacer' :
+                     etapa == 'CONTROL_CALIDAD' ? 'Control de calidad' :
+                     etapa == 'LISTO_ENTREGA' ? 'Listo para entrega' :
+                     #strings.capitalize(#strings.toLowerCase(etapa))}">
+      </div>
+
+      <div th:each="orden : ${ordenes}"
+           th:if="${orden.estadoActual == etapa}">
+        <div th:replace="~{fragmentos/tarjeta-kanban ::
+             tarjeta(${orden}, 'ARTESANO', '/artesano/kanban')}">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      const userId = /*[[${session.usuarioId}]]*/ null;
+      initKanban('ARTESANO', userId);
+    });
+  </script>
+
+</div>
+
+</body>
+</html>
