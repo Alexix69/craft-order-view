@@ -45,33 +45,43 @@
   </div>
 
   <!-- Tablero Kanban -->
-  <div th:unless="${#lists.isEmpty(ordenes)}"
-       class="kanban-board"
-       id="kanban"
-       th:attr="data-rol='ARTESANO',data-usuario-id=${session.usuarioId}">
+  <div th:unless="${#lists.isEmpty(ordenes)}" class="kanban-wrapper">
 
-    <!-- Columnas del artesano -->
-    <div th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
-                               'ACABADOS','CONTROL_CALIDAD','LISTO_ENTREGA'} }"
-         class="kanban-columna"
-         th:attr="data-etapa=${etapa}">
-
-      <div class="fw-semibold small mb-2 px-2 py-1 rounded"
-           style="background:var(--co-bg-card)"
-           th:text="${etapa == 'ASIGNADO' ? 'Por hacer' :
-                     etapa == 'CONTROL_CALIDAD' ? 'Control de calidad' :
-                     etapa == 'LISTO_ENTREGA' ? 'Listo para entrega' :
-                     #strings.capitalize(#strings.toLowerCase(etapa))}">
-      </div>
-
-      <div th:each="orden : ${ordenes}"
-           th:if="${orden.estadoActual == etapa}">
-        <div th:replace="~{fragmentos/tarjeta-kanban ::
-             tarjeta(${orden}, 'ARTESANO', '/artesano/kanban')}">
-        </div>
+    <!-- Fila 1: cabeceras fijas de cada columna -->
+    <div class="kanban-headers" id="kanbanHeaders">
+      <div th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
+                                 'ACABADOS','CONTROL_CALIDAD','LISTO_ENTREGA'} }"
+           class="kanban-col-header">
+        <span class="fw-semibold small"
+              th:text="${etapa == 'ASIGNADO' ? 'Por hacer' :
+                        etapa == 'CONTROL_CALIDAD' ? 'Control de calidad' :
+                        etapa == 'LISTO_ENTREGA' ? 'Listo para entrega' :
+                        #strings.capitalize(#strings.toLowerCase(etapa))}">
+        </span>
+        <span class="badge bg-secondary ms-1"
+              th:text="${#lists.size(ordenes.?[estadoActual == '__${etapa}__'])}">
+        </span>
       </div>
     </div>
 
+    <!-- Fila 2: cuerpo scrolleable con tarjetas -->
+    <div class="kanban-body" id="kanban"
+         th:attr="data-rol='ARTESANO',data-usuario-id=${session.usuarioId}">
+
+      <!-- Columnas del artesano -->
+      <div th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
+                                 'ACABADOS','CONTROL_CALIDAD','LISTO_ENTREGA'} }"
+           class="kanban-columna"
+           th:attr="data-etapa=${etapa}">
+        <div th:each="orden : ${ordenes}"
+             th:if="${orden.estadoActual == etapa}">
+          <div th:replace="~{fragmentos/tarjeta-kanban ::
+               tarjeta(${orden}, 'ARTESANO', '/artesano/kanban')}">
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <script th:inline="javascript">

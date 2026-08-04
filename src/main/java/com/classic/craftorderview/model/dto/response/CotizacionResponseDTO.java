@@ -31,4 +31,5 @@ public class CotizacionResponseDTO {
     private OffsetDateTime createdAt;
     private List<HistorialOrdenResponseDTO> historialOrden;
     private String estadoOrden;
+    private String pdfUrl;
 }

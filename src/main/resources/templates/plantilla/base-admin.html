@@ -20,6 +20,18 @@
 </head>
 <body>
 
+<!-- Toast del buscador global por token -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:9999">
+  <div id="navToastError" class="toast align-items-center
+       text-bg-danger border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body" id="navToastMensaje"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
 <div class="d-flex">
 
   <!-- Sidebar -->
@@ -81,28 +93,48 @@
               type="button" aria-label="Toggle sidebar">
         <i class="bi bi-list fs-4"></i>
       </button>
-      <div class="dropdown">
-        <button class="btn border-0 dropdown-toggle d-flex align-items-center gap-2"
-                style="color:var(--co-sidebar-text)"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false">
-          <i class="fa-solid fa-circle-user fa-lg"></i>
-          <span th:text="${session.usuarioNombre != null ? session.usuarioNombre : 'Usuario'}">Usuario</span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li>
-            <a class="dropdown-item" th:href="@{/admin/cambiar-contrasena}">
-              <i class="fa-solid fa-key me-2"></i>Cambiar contraseña
-            </a>
-          </li>
-          <li><hr class="dropdown-divider"></li>
-          <li>
-            <a class="dropdown-item text-danger" th:href="@{/logout}">
-              <i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar sesión
-            </a>
-          </li>
-        </ul>
+      <div class="d-flex align-items-center flex-grow-1 justify-content-end">
+        <form id="formBuscadorToken"
+              class="d-flex align-items-center gap-2 me-3"
+              onsubmit="buscarPorToken(event)">
+          <div class="input-group input-group-sm" style="width:280px">
+            <input type="text"
+                   id="inputToken"
+                   class="form-control"
+                   placeholder="Buscar por token..."
+                   maxlength="32"
+                   style="border-radius:6px 0 0 6px">
+            <button type="submit"
+                    class="btn btn-sm"
+                    style="background:var(--co-primary);color:white;
+                           border-radius:0 6px 6px 0">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+        </form>
+        <div class="dropdown">
+          <button class="btn border-0 dropdown-toggle d-flex align-items-center gap-2"
+                  style="color:var(--co-sidebar-text)"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            <i class="fa-solid fa-circle-user fa-lg"></i>
+            <span th:text="${session.usuarioNombre != null ? session.usuarioNombre : 'Usuario'}">Usuario</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" th:href="@{/admin/cambiar-contrasena}">
+                <i class="fa-solid fa-key me-2"></i>Cambiar contraseña
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" th:href="@{/logout}">
+                <i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar sesión
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
