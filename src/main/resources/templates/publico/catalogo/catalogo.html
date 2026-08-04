@@ -57,7 +57,7 @@
           <p class="card-text small" style="color:var(--co-text-secondary)" th:text="${tipo.descripcion}">Descripción</p>
         </div>
         <div class="card-footer bg-transparent" style="border-top:1px solid var(--co-border)">
-          <a th:href="@{/cotizar}" class="btn btn-primary w-100">Solicitar cotización</a>
+          <a th:href="@{/cotizar(tipoMuebleId=${tipo.id})}" class="btn btn-primary w-100">Solicitar cotización</a>
         </div>
       </div>
     </div>

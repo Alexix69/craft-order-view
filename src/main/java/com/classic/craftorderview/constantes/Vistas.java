@@ -9,6 +9,9 @@ public final class Vistas {
     public static final String LOGIN = "plantilla/login";
     public static final String CAMBIAR_CONTRASENA = "plantilla/cambiar-contrasena";
     public static final String CATALOGO = "publico/catalogo/catalogo";
+    public static final String COTIZAR = "publico/cotizar/cotizar";
+    public static final String COTIZAR_CONFIRMAR = "publico/cotizar/confirmar";
+    public static final String COTIZAR_EXITO = "publico/cotizar/exito";
     public static final String ERROR = "error";
 
     // Admin
