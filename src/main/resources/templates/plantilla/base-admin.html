@@ -39,12 +39,6 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" th:href="@{/admin/cotizaciones}"
-           th:classappend="${seccionActiva != null and #strings.startsWith(seccionActiva, '/admin/cotizaciones')} ? 'active' : ''">
-          <i class="bi bi-file-earmark-text"></i>Cotizaciones
-        </a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" th:href="@{/admin/artesanos}"
            th:classappend="${seccionActiva != null and #strings.startsWith(seccionActiva, '/admin/artesanos')} ? 'active' : ''">
           <i class="bi bi-people"></i>Artesanos
@@ -63,8 +57,14 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" th:href="@{/admin/ordenes}"
-           th:classappend="${seccionActiva != null and #strings.startsWith(seccionActiva, '/admin/ordenes')} ? 'active' : ''">
+        <a class="nav-link" th:href="@{/admin/cotizaciones}"
+           th:classappend="${seccionActiva != null and #strings.startsWith(seccionActiva, '/admin/cotizaciones')} ? 'active' : ''">
+          <i class="bi bi-file-earmark-text"></i>Cotizaciones
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/admin/kanban}"
+           th:classappend="${seccionActiva != null and #strings.startsWith(seccionActiva, '/admin/kanban')} ? 'active' : ''">
           <i class="bi bi-tools"></i>Órdenes de Producción
         </a>
       </li>
@@ -126,6 +126,7 @@
 <script th:src="@{/assets/js/craftorder.js}"></script>
 <script th:src="@{/assets/js/craftorder-forms.js}"></script>
 <script th:src="@{/assets/js/craftorder-modals.js}"></script>
+<script th:src="@{/assets/js/craftorder-kanban.js}"></script>
 
 </body>
 </html>

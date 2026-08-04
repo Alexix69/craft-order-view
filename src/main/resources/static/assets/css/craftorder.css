@@ -214,6 +214,7 @@ body {
 .badge-estado-aprobada        { background-color: rgba(92,122,74,0.12);  color: #2E4F1A; }
 .badge-estado-pagada          { background-color: rgba(74,122,155,0.12); color: #1A3D52; }
 .badge-estado-rechazada       { background-color: rgba(192,57,43,0.12);  color: #7A1A10; }
+.badge-estado-asignado        { background-color: rgba(107,85,64,0.12);  color: #4A3626; }
 .badge-estado-corte           { background-color: rgba(184,168,152,0.20); color: #5A4A3A; }
 .badge-estado-ensamblado      { background-color: rgba(74,122,155,0.12); color: #1A3D52; }
 .badge-estado-acabados        { background-color: rgba(139,94,60,0.12);  color: #5A2A0A; }
@@ -266,6 +267,70 @@ body {
   content: " *";
   color: #dc3545;
   font-weight: 600;
+}
+
+/* ------------------------------------------------------------
+   15. Tablero Kanban (HU-12, HU-15, HU-16) — responsive
+   ------------------------------------------------------------ */
+/* El contenedor de contenido de base-admin.html/base-artesano.html
+   (".d-flex.flex-column.flex-grow-1.min-vh-100") es un ítem flex de la fila
+   sidebar+contenido. Por defecto un ítem flex nunca se encoge por debajo del
+   ancho mínimo de su contenido — sin este corte, el tablero Kanban empuja
+   todo el layout (body/html) a scrollear horizontalmente en vez de scrollear
+   solo internamente en .kanban-board. */
+.d-flex.flex-column.flex-grow-1.min-vh-100 {
+    min-width: 0;
+}
+
+.kanban-board {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    width: 100%;
+    min-width: 0;
+}
+
+.kanban-columna {
+    flex: 0 0 240px;
+    min-width: 240px;
+    scroll-snap-align: start;
+    background: var(--co-bg-card);
+    border-radius: 10px;
+    padding: 0.75rem;
+    border: 1px solid var(--co-border);
+}
+
+/* En móvil: columnas ocupan casi todo el ancho */
+@media (max-width: 768px) {
+    .kanban-columna {
+        flex: 0 0 85vw;
+        min-width: 85vw;
+    }
+
+    .kanban-board {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Columna resaltada al arrastrar sobre ella */
+.kanban-drop-target {
+    border: 2px dashed var(--co-primary) !important;
+    background: rgba(139, 94, 60, 0.05) !important;
+}
+
+/* Tarjeta siendo arrastrada */
+.kanban-tarjeta[draggable="true"]:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+    transition: all 0.15s ease;
+}
+
+.kanban-tarjeta[draggable="false"] {
+  cursor: default !important;
 }
 
 /* ============================================================

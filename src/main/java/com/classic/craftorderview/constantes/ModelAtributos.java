@@ -21,4 +21,10 @@ public final class ModelAtributos {
     public static final String SESSION_USUARIO_NOMBRE = "usuarioNombre";
     public static final String SESSION_USUARIO_ROL = "usuarioRol";
     public static final String SESSION_PRIMER_LOGIN = "primerLogin";
+
+    // Kanban / órdenes de producción
+    public static final String ORDENES = "ordenes";
+    public static final String ORDEN = "orden";
+    public static final String ARTESANOS = "artesanos";
+    public static final String HISTORIAL = "historial";
 }
