@@ -1,0 +1,225 @@
+/* ============================================================
+   craftorder.css — Paleta oficial Classic Mueblería
+   Cargado DESPUÉS de theme.css y theme-2026.css para sobreescribir.
+   Bootstrap 5.3.8 como base de componentes interactivos.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Variables de la paleta
+   ------------------------------------------------------------ */
+:root {
+  /* Primarios — madera */
+  --co-primary:        #8B5E3C;
+  --co-primary-dark:   #6B4828;
+  --co-primary-light:  #A8784F;
+  --co-primary-rgb:    139, 94, 60;
+
+  /* Fondos y superficies */
+  --co-bg-page:        #FAF7F2;
+  --co-bg-card:        #FFFFFF;
+  --co-border:         #E8DDD0;
+
+  /* Sidebar y navbar */
+  --co-sidebar-bg:     #2C2416;
+  --co-sidebar-text:   #C8B89A;
+  --co-sidebar-active-bg:   #8B5E3C;
+  --co-sidebar-active-text: #FFF8F0;
+
+  /* Tipografía */
+  --co-text-primary:   #1A1208;
+  --co-text-secondary: #6B5540;
+  --co-text-muted:     #B8A898;
+
+  /* Estados semánticos */
+  --co-success:        #5C7A4A;
+  --co-danger:         #C0392B;
+  --co-warning:        #B7860B;
+  --co-info:           #4A7A9B;
+
+  /* Estados de orden (Kanban) */
+  --co-estado-corte:          #B8A898;
+  --co-estado-ensamblado:     #4A7A9B;
+  --co-estado-acabados:       #8B5E3C;
+  --co-estado-control:        #B7860B;
+  --co-estado-listo:          #5C7A4A;
+}
+
+/* ------------------------------------------------------------
+   2. Fondo de página y tipografía base
+   ------------------------------------------------------------ */
+body {
+  background-color: var(--co-bg-page);
+  color: var(--co-text-primary);
+}
+
+/* ------------------------------------------------------------
+   6. Botones Bootstrap — paleta madera
+   (reemplaza .m-btn del tema para componentes nuevos)
+   ------------------------------------------------------------ */
+.btn-primary {
+  background-color: var(--co-primary);
+  border-color: var(--co-primary);
+  color: #FFF8F0;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--co-primary-dark);
+  border-color: var(--co-primary-dark);
+  color: #FFF8F0;
+}
+
+.btn-primary:focus-visible {
+  box-shadow: 0 0 0 0.25rem rgba(var(--co-primary-rgb), 0.35);
+}
+
+.btn-outline-primary {
+  color: var(--co-primary);
+  border-color: var(--co-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--co-primary);
+  border-color: var(--co-primary);
+  color: #FFF8F0;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border-color: var(--co-border);
+  color: var(--co-text-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--co-border);
+  border-color: var(--co-border);
+  color: var(--co-text-primary);
+}
+
+/* ------------------------------------------------------------
+   8. Tablas
+   ------------------------------------------------------------ */
+.table {
+  color: var(--co-text-primary);
+  border-color: var(--co-border);
+}
+
+.table thead th {
+  color: var(--co-text-secondary);
+  border-bottom-color: var(--co-border);
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(139, 94, 60, 0.04);
+}
+
+/* ------------------------------------------------------------
+   9. Formularios (inputs y selects — Bootstrap puro)
+   ------------------------------------------------------------ */
+.form-control,
+.form-select {
+  border-color: var(--co-border);
+  color: var(--co-text-primary);
+  background-color: var(--co-bg-card);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--co-primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(var(--co-primary-rgb), 0.20);
+}
+
+.form-control::placeholder {
+  color: var(--co-text-muted);
+}
+
+.form-label {
+  color: var(--co-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+
+/* ------------------------------------------------------------
+   10. Modales — superficie y bordes cálidos
+   ------------------------------------------------------------ */
+.modal-content {
+  background-color: var(--co-bg-card);
+  border: 1px solid var(--co-border);
+  border-radius: 10px;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--co-border);
+  padding: 1rem 1.25rem;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--co-border);
+  padding: 0.75rem 1.25rem;
+}
+
+.modal-title {
+  color: var(--co-text-primary);
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------
+   11. Alertas — estados semánticos
+   ------------------------------------------------------------ */
+.alert-warning {
+  background-color: rgba(183, 134, 11, 0.10);
+  border-color: rgba(183, 134, 11, 0.30);
+  color: #7A5800;
+}
+
+.alert-danger {
+  background-color: rgba(192, 57, 43, 0.10);
+  border-color: rgba(192, 57, 43, 0.30);
+  color: #7A1A10;
+}
+
+.alert-success {
+  background-color: rgba(92, 122, 74, 0.10);
+  border-color: rgba(92, 122, 74, 0.30);
+  color: #2E4F1A;
+}
+
+.modal-backdrop {
+  z-index: 1050 !important;
+}
+
+.modal {
+  z-index: 1055 !important;
+}
+
+.modal-dialog {
+  z-index: 1056 !important;
+  position: relative;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 1057 !important;
+}
+
+/* ------------------------------------------------------------
+   12. Badges de estado para cotizaciones y órdenes
+   ------------------------------------------------------------ */
+.badge-estado-pendiente       { background-color: rgba(183,134,11,0.12); color: #7A5800; }
+.badge-estado-aprobada        { background-color: rgba(92,122,74,0.12);  color: #2E4F1A; }
+.badge-estado-pagada          { background-color: rgba(74,122,155,0.12); color: #1A3D52; }
+.badge-estado-rechazada       { background-color: rgba(192,57,43,0.12);  color: #7A1A10; }
+.badge-estado-corte           { background-color: rgba(184,168,152,0.20); color: #5A4A3A; }
+.badge-estado-ensamblado      { background-color: rgba(74,122,155,0.12); color: #1A3D52; }
+.badge-estado-acabados        { background-color: rgba(139,94,60,0.12);  color: #5A2A0A; }
+.badge-estado-control_calidad { background-color: rgba(183,134,11,0.12); color: #7A5800; }
+.badge-estado-listo_entrega   { background-color: rgba(92,122,74,0.12);  color: #2E4F1A; }
+
+/* ============================================================
+   FIN craftorder.css
+   ============================================================ */

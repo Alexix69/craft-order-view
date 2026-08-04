@@ -1,93 +1,156 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="es">
 <head th:fragment="head">
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="generator" content="CraftOrderView"/>
-    <title th:text="${tituloPagina} + ' | CraftOrderView'">CraftOrderView</title>
-    <link th:href="@{/assets/css/font-face.css}" rel="stylesheet" media="all"/>
-    <link th:href="@{/assets/vendor/fontawesome-7.2.0/css/all.min.css}" rel="stylesheet" media="all"/>
-    <link th:href="@{/assets/vendor/bootstrap-5.3.8.min.css}" rel="stylesheet" media="all"/>
-    <link th:href="@{/assets/vendor/css-hamburgers/hamburgers.min.css}" rel="stylesheet" media="all"/>
-    <link th:href="@{/assets/css/theme.css}" rel="stylesheet" media="all"/>
-    <link th:href="@{/assets/css/theme-2026.css}" rel="stylesheet" media="all"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${tituloPagina != null ? tituloPagina + ' | Classic Mueblería' :
+                   'Classic Mueblería'}">Classic Mueblería</title>
+  <link th:href="@{/assets/vendor/bootstrap-5.3.8.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/fontawesome-7.2.0/css/all.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/craftorder.css}" rel="stylesheet">
 </head>
+<body style="background:var(--co-bg-page)">
 
-<body class="theme-2026">
-<a class="visually-hidden-focusable skip-link" href="#main-content">Skip to main content</a>
-<div class="page-wrapper">
+<div class="d-flex" style="min-height:100vh">
 
-    <aside th:fragment="menu" class="menu-sidebar" id="main-sidebar">
-        <div class="logo">
-            <a class="logo-link" th:href="@{/admin/dashboard}" aria-label="CraftOrderView home">
-                <img th:src="@{/assets/images/icon/logo.png}" alt="CraftOrderView" height="28"/>
-            </a>
-            <button class="sidebar-close js-sidebar-toggle" type="button" aria-label="Close navigation">
-                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-            </button>
-        </div>
-        <div class="menu-sidebar__content js-scrollbar1">
-            <nav class="navbar-sidebar">
-                <ul class="list-unstyled navbar__list">
-                    <li class="active"><a th:href="@{/admin/dashboard}"><i class="fa-solid fa-tachometer-alt"></i>Dashboard</a></li>
-                    <li><a th:href="@{/admin/cotizaciones}"><i class="fa-solid fa-file-invoice"></i>Cotizaciones</a></li>
-                    <li><a th:href="@{/admin/artesanos}"><i class="fa-solid fa-users"></i>Artesanos</a></li>
-                    <li><a th:href="@{/admin/tiposmueble}"><i class="fa-solid fa-couch"></i>Tipos de Mueble</a></li>
-                    <li><a th:href="@{/admin/materiales}"><i class="fa-solid fa-tree"></i>Materiales</a></li>
-                    <li><a th:href="@{/admin/ordenes}"><i class="fa-solid fa-screwdriver-wrench"></i>Órdenes</a></li>
-                </ul>
-            </nav>
-        </div>
-    </aside>
+  <!-- Sidebar -->
+  <nav id="sidebar" th:fragment="menu"
+       class="d-flex flex-column flex-shrink-0 p-0"
+       style="width:260px;background:var(--co-sidebar-bg);min-height:100vh">
 
-    <div class="page-container">
-        <header th:fragment="header" class="header-desktop">
-            <div class="section__content section__content--p30">
-                <div class="container-fluid">
-                    <div class="header-wrap">
-                        <button class="sidebar-toggle js-sidebar-toggle" type="button" aria-label="Toggle navigation"
-                                aria-expanded="false" aria-controls="main-sidebar">
-                            <i class="fa-solid fa-bars" aria-hidden="true"></i>
-                        </button>
-                        <form class="form-header" role="search" onsubmit="return false">
-                            <i class="fa-solid fa-magnifying-glass form-header__icon" aria-hidden="true"></i>
-                            <input class="au-input au-input--xl" type="search" name="search"
-                                   placeholder="Buscar..." aria-label="Buscar"/>
-                        </form>
-                        <div class="header-button">
-                            <div class="account-wrap">
-                                <div class="account-item clearfix js-item-menu" role="button" tabindex="0"
-                                     aria-haspopup="true" aria-label="Menú de cuenta">
-                                    <div class="image">
-                                        <img th:src="@{/assets/images/icon/logo-white.png}" alt="Usuario"/>
-                                    </div>
-                                    <div class="content"><a class="js-acc-btn" href="#">Usuario</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="main-content" id="main-content">
-            <div class="section__content section__content--p30">
-                <div class="container-fluid" layout:fragment="contenido">
-                    <!-- Contenido de cada vista hija -->
-                </div>
-            </div>
-        </main>
-
-        <th:block th:fragment="footer">
-            <script th:src="@{/assets/vendor/bootstrap-5.3.8.bundle.min.js}"></script>
-            <script th:src="@{/assets/js/vanilla-utils.js}"></script>
-            <script th:src="@{/assets/js/bootstrap5-init.js}"></script>
-            <script th:src="@{/assets/js/main-vanilla.js}"></script>
-            <script th:src="@{/assets/js/modern-plugins.js}"></script>
-        </th:block>
+    <!-- Logo -->
+    <div class="p-3 d-flex align-items-center"
+         style="border-bottom:1px solid rgba(255,248,240,0.08)">
+      <span class="fw-bold fs-5"
+            style="color:var(--co-sidebar-active-text)">
+        <i class="fa-solid fa-hammer me-2"
+           style="color:var(--co-primary-light)"></i>
+        Classic Mueblería
+      </span>
     </div>
+
+    <!-- Navegación -->
+    <ul class="nav flex-column p-3 gap-1 flex-grow-1">
+
+      <li class="nav-item"
+          th:classappend="${seccionActiva == 'dashboard'} ? 'active' : ''">
+        <a class="nav-link d-flex align-items-center gap-2 rounded px-3 py-2"
+           th:href="@{/admin/dashboard}"
+           th:style="${seccionActiva == 'dashboard'} ?
+             'color:var(--co-sidebar-active-text);background:var(--co-primary)' :
+             'color:var(--co-sidebar-text)'">
+          <i class="fa-solid fa-gauge fa-fw"></i>
+          Dashboard
+        </a>
+      </li>
+
+      <li class="nav-item"
+          th:classappend="${seccionActiva == 'cotizaciones'} ? 'active' : ''">
+        <a class="nav-link d-flex align-items-center gap-2 rounded px-3 py-2"
+           th:href="@{/admin/cotizaciones}"
+           th:style="${seccionActiva == 'cotizaciones'} ?
+             'color:var(--co-sidebar-active-text);background:var(--co-primary)' :
+             'color:var(--co-sidebar-text)'">
+          <i class="fa-solid fa-file-invoice fa-fw"></i>
+          Cotizaciones
+        </a>
+      </li>
+
+      <li class="nav-item"
+          th:classappend="${seccionActiva == 'artesanos'} ? 'active' : ''">
+        <a class="nav-link d-flex align-items-center gap-2 rounded px-3 py-2"
+           th:href="@{/admin/artesanos}"
+           th:style="${seccionActiva == 'artesanos'} ?
+             'color:var(--co-sidebar-active-text);background:var(--co-primary)' :
+             'color:var(--co-sidebar-text)'">
+          <i class="fa-solid fa-users fa-fw"></i>
+          Artesanos
+        </a>
+      </li>
+
+      <li class="nav-item"
+          th:classappend="${seccionActiva == 'tiposmueble'} ? 'active' : ''">
+        <a class="nav-link d-flex align-items-center gap-2 rounded px-3 py-2"
+           th:href="@{/admin/tiposmueble}"
+           th:style="${seccionActiva == 'tiposmueble'} ?
+             'color:var(--co-sidebar-active-text);background:var(--co-primary)' :
+             'color:var(--co-sidebar-text)'">
+          <i class="fa-solid fa-couch fa-fw"></i>
+          Tipos de Mueble
+        </a>
+      </li>
+
+      <li class="nav-item"
+          th:classappend="${seccionActiva == 'materiales'} ? 'active' : ''">
+        <a class="nav-link d-flex align-items-center gap-2 rounded px-3 py-2"
+           th:href="@{/admin/materiales}"
+           th:style="${seccionActiva == 'materiales'} ?
+             'color:var(--co-sidebar-active-text);background:var(--co-primary)' :
+             'color:var(--co-sidebar-text)'">
+          <i class="fa-solid fa-tree fa-fw"></i>
+          Materiales
+        </a>
+      </li>
+
+      <li class="nav-item"
+          th:classappend="${seccionActiva == 'ordenes'} ? 'active' : ''">
+        <a class="nav-link d-flex align-items-center gap-2 rounded px-3 py-2"
+           th:href="@{/admin/ordenes}"
+           th:style="${seccionActiva == 'ordenes'} ?
+             'color:var(--co-sidebar-active-text);background:var(--co-primary)' :
+             'color:var(--co-sidebar-text)'">
+          <i class="fa-solid fa-screwdriver-wrench fa-fw"></i>
+          Órdenes de Producción
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+
+  <!-- Contenido principal -->
+  <div class="d-flex flex-column flex-grow-1">
+
+    <!-- Navbar superior -->
+    <nav th:fragment="header" class="navbar px-4 py-2 d-flex align-items-center
+         justify-content-between"
+         style="background:var(--co-sidebar-bg);
+                border-bottom:1px solid rgba(255,248,240,0.08)">
+
+      <!-- Hamburguesa -->
+      <button class="btn border-0 p-1 js-sidebar-toggle"
+              style="color:var(--co-sidebar-text)"
+              aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars fa-lg"></i>
+      </button>
+
+      <!-- Usuario -->
+      <div class="d-flex align-items-center gap-2"
+           style="color:var(--co-sidebar-text);cursor:pointer">
+        <i class="fa-solid fa-circle-user fa-lg"></i>
+        <span th:text="${session.usuarioNombre != null ?
+                         session.usuarioNombre : 'Usuario'}">
+          Usuario
+        </span>
+      </div>
+    </nav>
+
+    <!-- Zona de contenido (vistas hijas inyectan aquí) -->
+    <main class="flex-grow-1 p-4">
+      <div layout:fragment="contenido">
+        <!-- contenido de la vista hija -->
+      </div>
+    </main>
+
+  </div>
 </div>
+
+<!-- Scripts -->
+<div th:fragment="footer">
+  <script th:src="@{/assets/vendor/bootstrap-5.3.8.bundle.min.js}"></script>
+  <script th:src="@{/assets/js/craftorder.js}"></script>
+</div>
+
 </body>
 </html>
