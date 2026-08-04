@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.Map;
+
 @Service
 public class CotizacionApiService {
 
@@ -109,6 +111,19 @@ public class CotizacionApiService {
                     .block();
         } catch (WebClientResponseException e) {
             throw new RuntimeException(extraerMensaje(e, "Error al rechazar la cotización"));
+        }
+    }
+
+    public Map<String, Object> buscarTokenAdmin(String token) {
+        try {
+            return webClient.get()
+                    .uri("/cotizaciones/buscar/{token}", token)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                    })
+                    .block();
+        } catch (WebClientResponseException e) {
+            throw new RuntimeException("Token no encontrado");
         }
     }
 

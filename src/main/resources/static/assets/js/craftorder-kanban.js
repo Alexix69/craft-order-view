@@ -5,8 +5,8 @@
  */
 
 const ETAPAS = [
-  'ASIGNADO', 'CORTE', 'ENSAMBLADO',
-  'ACABADOS', 'CONTROL_CALIDAD', 'LISTO_ENTREGA'
+    'ASIGNADO', 'CORTE', 'ENSAMBLADO',
+    'ACABADOS', 'CONTROL_CALIDAD', 'LISTO_ENTREGA'
 ];
 
 // Rol del usuario actual (inyectado por Thymeleaf en data-rol del contenedor)
@@ -14,9 +14,9 @@ let ROL_ACTUAL = null;
 let USUARIO_ID = null;
 
 // Datos del drag en curso
-let _ordenId       = null;
-let _etapaOrigen   = null;
-let _etapaDestino  = null;
+let _ordenId = null;
+let _etapaOrigen = null;
+let _etapaDestino = null;
 
 /**
  * Inicializa el Kanban. Llamar en DOMContentLoaded.
@@ -45,10 +45,10 @@ function initKanban(rol, userId) {
     // Los enlaces dentro de una tarjeta (nombre, ícono de detalle) no deben
     // iniciar un drag — permiten el click normal para navegar al detalle.
     document.querySelectorAll('.kanban-tarjeta a').forEach(enlace => {
-        enlace.addEventListener('mousedown', function(e) {
+        enlace.addEventListener('mousedown', function (e) {
             e.stopPropagation();
         });
-        enlace.addEventListener('dragstart', function(e) {
+        enlace.addEventListener('dragstart', function (e) {
             e.preventDefault();
             e.stopPropagation();
         });
@@ -56,7 +56,7 @@ function initKanban(rol, userId) {
 }
 
 function onDragStart(e) {
-    _ordenId     = this.dataset.ordenId;
+    _ordenId = this.dataset.ordenId;
     _etapaOrigen = this.dataset.etapa;
     this.classList.add('opacity-50');
     e.dataTransfer.effectAllowed = 'move';
@@ -85,9 +85,9 @@ function onDrop(e) {
 
     if (!_etapaDestino || _etapaDestino === _etapaOrigen) return;
 
-    const indiceOrigen  = ETAPAS.indexOf(_etapaOrigen);
+    const indiceOrigen = ETAPAS.indexOf(_etapaOrigen);
     const indiceDestino = ETAPAS.indexOf(_etapaDestino);
-    const esRetroceso   = indiceDestino < indiceOrigen;
+    const esRetroceso = indiceDestino < indiceOrigen;
 
     // Bloquear si artesano intenta retroceder
     if (ROL_ACTUAL === 'ARTESANO' && esRetroceso) return;
@@ -239,8 +239,8 @@ function filtrarKanban() {
 
     if (periodo === 'hoy') {
         fechaLimite = new Date(ahora.getFullYear(),
-                               ahora.getMonth(),
-                               ahora.getDate());
+            ahora.getMonth(),
+            ahora.getDate());
     } else if (periodo !== 'todos') {
         const dias = parseInt(periodo);
         fechaLimite = new Date(ahora.getTime() - dias * 24 * 60 * 60 * 1000);
@@ -250,7 +250,7 @@ function filtrarKanban() {
 
     document.querySelectorAll('.kanban-tarjeta').forEach(tarjeta => {
         const textoTarjeta = (tarjeta.dataset.busqueda || '').toLowerCase();
-        const fechaStr     = tarjeta.dataset.fecha || '';
+        const fechaStr = tarjeta.dataset.fecha || '';
         const fechaTarjeta = fechaStr ? new Date(fechaStr) : null;
 
         const pasaTexto = !textoBusqueda ||
@@ -277,7 +277,33 @@ function filtrarKanban() {
 function limpiarFiltroKanban() {
     const input = document.getElementById('kanbanBusqueda');
     const select = document.getElementById('kanbanPeriodo');
-    if (input)  input.value = '';
+    if (input) input.value = '';
     if (select) select.value = 'todos';
     filtrarKanban();
 }
+
+// Sincronizar scroll horizontal entre cabeceras y cuerpo del Kanban
+document.addEventListener('DOMContentLoaded', function () {
+    const headers = document.getElementById('kanbanHeaders');
+    const body = document.getElementById('kanban');
+
+    if (headers && body) {
+        body.addEventListener('scroll', function () {
+            headers.scrollLeft = body.scrollLeft;
+        });
+    }
+});
+
+function igualarAlturaColumnas() {
+    const columnas = document.querySelectorAll('.kanban-columna');
+    columnas.forEach(c => c.style.minHeight = '');
+    let maxAltura = 0;
+    columnas.forEach(c => {
+        if (c.scrollHeight > maxAltura) maxAltura = c.scrollHeight;
+    });
+    columnas.forEach(c => c.style.minHeight = maxAltura + 'px');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    igualarAlturaColumnas();
+});

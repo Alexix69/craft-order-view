@@ -88,63 +88,84 @@
   </div>
 
   <!-- Tablero Kanban -->
-  <div class="kanban-board"
-       id="kanban"
-       th:attr="data-rol='ADMIN',data-usuario-id=${session.usuarioId}">
+  <div class="kanban-wrapper">
 
-    <!-- Columna: SIN ASIGNAR -->
-    <div class="kanban-columna"
-         data-etapa="SIN_ASIGNAR">
-      <div class="fw-semibold small mb-2 px-2 py-1 rounded"
-           style="background:var(--co-bg-card);
-                  color:var(--co-text-secondary)">
-        Sin asignar
+    <!-- Fila 1: cabeceras fijas de cada columna -->
+    <div class="kanban-headers" id="kanbanHeaders">
+
+      <!-- Cabecera: Sin asignar -->
+      <div class="kanban-col-header">
+        <span class="fw-semibold small"
+              style="color:var(--co-text-secondary)">
+          Sin asignar
+        </span>
         <span class="badge bg-secondary ms-1"
               th:text="${sinAsignar.size()}">0</span>
       </div>
-      <div th:each="cot : ${sinAsignar}">
-        <div class="card mb-2 shadow-sm"
-             style="border-left:4px solid #6c757d;border-radius:8px">
-          <div class="card-body p-3">
-            <h6 class="fw-bold mb-1 small"
-                th:text="${cot.tipoMuebleNombre}"></h6>
-            <p class="mb-1 small"
-               th:text="${cot.nombreCliente}"></p>
-            <p class="mb-2 small"
-               th:text="'$' + ${#numbers.formatDecimal(
-                 cot.costoAprobado,1,'COMMA',2,'POINT')}"></p>
-            <button type="button"
-                    class="btn btn-sm btn-primary w-100"
-                    th:attr="onclick='abrirModalAsignar(' +
-                             ${cot.id} + ')'">
-              Asignar artesano
-            </button>
+
+      <!-- Cabeceras de etapas de producción -->
+      <div th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
+                                 'ACABADOS','CONTROL_CALIDAD',
+                                 'LISTO_ENTREGA'} }"
+           class="kanban-col-header">
+        <span class="fw-semibold small"
+              style="color:var(--co-text-secondary)"
+              th:text="${etapa == 'ASIGNADO' ? 'Sin iniciar' :
+                        etapa == 'CONTROL_CALIDAD' ? 'Control de calidad' :
+                        etapa == 'LISTO_ENTREGA' ? 'Listo para entrega' :
+                        #strings.capitalize(#strings.toLowerCase(etapa))}">
+        </span>
+        <span class="badge bg-secondary ms-1"
+              th:text="${#lists.size(ordenes.?[estadoActual == '__${etapa}__'])}">
+              0
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Fila 2: cuerpo scrolleable con tarjetas -->
+    <div class="kanban-body" id="kanban"
+         th:attr="data-rol='ADMIN',
+                  data-usuario-id=${session.usuarioId}">
+
+      <!-- Columna: Sin asignar (no tiene drag) -->
+      <div class="kanban-columna" data-etapa="SIN_ASIGNAR">
+        <div th:each="cot : ${sinAsignar}">
+          <div class="card mb-2 shadow-sm"
+               style="border-left:4px solid #6c757d;border-radius:8px">
+            <div class="card-body p-3">
+              <h6 class="fw-bold mb-1 small"
+                  th:text="${cot.tipoMuebleNombre}"></h6>
+              <p class="mb-1 small"
+                 th:text="${cot.nombreCliente}"></p>
+              <p class="mb-2 small"
+                 th:text="'$' + ${#numbers.formatDecimal(
+                   cot.costoAprobado,1,'COMMA',2,'POINT')}"></p>
+              <button type="button"
+                      class="btn btn-sm btn-primary w-100"
+                      th:attr="onclick='abrirModalAsignar(' +
+                               ${cot.id} + ')'">
+                Asignar artesano
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Columnas de etapas de producción -->
-    <div th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
-                               'ACABADOS','CONTROL_CALIDAD','LISTO_ENTREGA'} }"
-         class="kanban-columna"
-         th:attr="data-etapa=${etapa}">
-
-      <div class="fw-semibold small mb-2 px-2 py-1 rounded"
-           style="background:var(--co-bg-card);
-                  color:var(--co-text-secondary)"
-           th:text="${etapa == 'ASIGNADO' ? 'Sin iniciar' :
-                     etapa == 'CONTROL_CALIDAD' ? 'Control de calidad' :
-                     etapa == 'LISTO_ENTREGA' ? 'Listo para entrega' :
-                     #strings.capitalize(#strings.toLowerCase(etapa))}">
-      </div>
-
-      <div th:each="orden : ${ordenes}"
-           th:if="${orden.estadoActual == etapa}">
-        <div th:replace="~{fragmentos/tarjeta-kanban ::
-             tarjeta(${orden}, 'ADMIN', '/admin/kanban')}">
+      <!-- Columnas de etapas -->
+      <div th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
+                                 'ACABADOS','CONTROL_CALIDAD',
+                                 'LISTO_ENTREGA'} }"
+           class="kanban-columna"
+           th:attr="data-etapa=${etapa}">
+        <div th:each="orden : ${ordenes}"
+             th:if="${orden.estadoActual == etapa}">
+          <div th:replace="~{fragmentos/tarjeta-kanban ::
+               tarjeta(${orden}, 'ADMIN', '/admin/kanban')}">
+          </div>
         </div>
       </div>
+
     </div>
 
   </div>

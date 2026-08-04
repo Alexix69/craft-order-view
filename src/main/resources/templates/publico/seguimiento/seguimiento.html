@@ -17,33 +17,52 @@
           Token: <code th:text="${cotizacion.token}"></code>
         </p>
 
-        <!-- Badge de estado -->
-        <div class="mb-4">
-          <span th:switch="${cotizacion.estado}">
-            <span th:case="'PENDIENTE'" class="badge bg-warning text-dark fs-6 px-3 py-2">
-              En revisión
-            </span>
-            <span th:case="'APROBADA'" class="badge bg-info text-dark fs-6 px-3 py-2">
-              Aprobada — pendiente de pago
-            </span>
-            <span th:case="'RECHAZADA'" class="badge bg-danger fs-6 px-3 py-2">
-              Rechazada
-            </span>
-            <span th:case="'PAGADA'">
-              <span th:if="${cotizacion.estadoOrden == null}"
-                    class="badge bg-success fs-6 px-3 py-2">
-                Pago recibido — asignando artesano
+        <!-- Fila de estado + descarga factura -->
+        <div class="row align-items-center mb-4">
+
+          <!-- Columna izquierda: badge de estado -->
+          <div class="col-4">
+            <span th:switch="${cotizacion.estado}">
+              <span th:case="'PENDIENTE'" class="badge bg-warning text-dark fs-6 px-3 py-2">
+                En revisión
               </span>
-              <span th:unless="${cotizacion.estadoOrden == null}"
-                    class="badge bg-primary fs-6 px-3 py-2"
-                    th:text="${cotizacion.estadoOrden == 'ASIGNADO' ?
-                              'Artesano asignado — por iniciar' :
-                              cotizacion.estadoOrden == 'LISTO_ENTREGA' ?
-                              'Listo para entrega' :
-                              'En producción — ' + cotizacion.estadoOrden}">
+              <span th:case="'APROBADA'" class="badge bg-info text-dark fs-6 px-3 py-2">
+                Aprobada — pendiente de pago
+              </span>
+              <span th:case="'RECHAZADA'" class="badge bg-danger fs-6 px-3 py-2">
+                Rechazada
+              </span>
+              <span th:case="'PAGADA'">
+                <span th:if="${cotizacion.estadoOrden == null}"
+                      class="badge bg-success fs-6 px-3 py-2">
+                  Pago recibido — asignando artesano
+                </span>
+                <span th:unless="${cotizacion.estadoOrden == null}"
+                      class="badge bg-primary fs-6 px-3 py-2"
+                      th:text="${cotizacion.estadoOrden == 'ASIGNADO' ?
+                                'Artesano asignado — por iniciar' :
+                                cotizacion.estadoOrden == 'LISTO_ENTREGA' ?
+                                'Listo para entrega' :
+                                'En producción — ' + cotizacion.estadoOrden}">
+                </span>
               </span>
             </span>
-          </span>
+          </div>
+
+          <!-- Columna central: vacía (separador visual) -->
+          <div class="col-4"></div>
+
+          <!-- Columna derecha: botón de factura (solo si aplica) -->
+          <div class="col-4 text-end">
+            <a th:if="${cotizacion.estadoOrden == 'LISTO_ENTREGA'
+                       and cotizacion.pdfUrl != null}"
+               th:href="${cotizacion.pdfUrl}"
+               target="_blank"
+               class="btn btn-sm btn-outline-primary">
+              <i class="fa-solid fa-file-pdf me-1"></i>Descargar factura
+            </a>
+          </div>
+
         </div>
 
         <!-- Resumen de configuración -->
@@ -125,6 +144,7 @@
             HISTORIAL DE TU PEDIDO
           </h6>
           <div th:each="evento : ${cotizacion.historialOrden}"
+               th:if="${evento.tipoEvento == 'CAMBIO_ETAPA'}"
                class="d-flex gap-3 mb-3">
             <div>
               <span th:if="${evento.motivo != null}"

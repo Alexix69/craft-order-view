@@ -10,6 +10,27 @@
 
   <div layout:fragment="contenidopaginas">
 
+    <!-- Spinner overlay -->
+    <div id="kanbanSpinner"
+         class="d-none position-fixed top-0 start-0 w-100 h-100
+                d-flex align-items-center justify-content-center"
+         style="background:rgba(0,0,0,0.5);z-index:9999">
+      <div class="spinner-border text-light"
+           style="width:3rem;height:3rem"></div>
+    </div>
+
+    <!-- Toast de error -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index:9999">
+      <div id="kanbanToastError" class="toast align-items-center
+           text-bg-danger border-0" role="alert">
+        <div class="d-flex">
+          <div class="toast-body" id="kanbanToastMensaje"></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                  data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    </div>
+
     <div class="d-flex align-items-center gap-3 mb-4">
       <a th:href="@{/admin/kanban}" class="btn btn-sm btn-outline-secondary">
         <i class="fa-solid fa-arrow-left me-1"></i>Volver al tablero
@@ -21,13 +42,22 @@
 
     <div class="row g-4">
 
-      <!-- Datos del cliente -->
-      <div class="col-md-6">
+      <!-- Datos del cliente — solo admin -->
+      <div class="col-md-6" th:if="${session.usuarioRol == 'ADMIN'}">
         <div class="card p-4 h-100" style="border:1px solid var(--co-border);border-radius:10px">
           <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">DATOS DEL CLIENTE</h6>
           <dl class="row mb-0" style="color:var(--co-text-primary)">
             <dt class="col-sm-5">Nombre</dt>
             <dd class="col-sm-7" th:text="${orden.nombreCliente}"></dd>
+            <dt class="col-sm-5">Correo</dt>
+            <dd class="col-sm-7">
+              <a th:href="'mailto:' + ${orden.correoCliente}" th:text="${orden.correoCliente}"></a>
+            </dd>
+            <dt class="col-sm-5">Teléfono</dt>
+            <dd class="col-sm-7" th:text="${orden.telefonoCliente}"></dd>
+            <dt class="col-sm-5">Costo aprobado</dt>
+            <dd class="col-sm-7 fw-bold" style="color:var(--co-primary)"
+                th:text="'$' + ${#numbers.formatDecimal(orden.costoAprobado,1,'COMMA',2,'POINT')}"></dd>
             <dt class="col-sm-5">Artesano asignado</dt>
             <dd class="col-sm-7" th:text="${orden.artesanoNombre}"></dd>
             <dt class="col-sm-5">Inicio</dt>
@@ -96,6 +126,82 @@
         </div>
       </div>
 
+      <!-- Cambio de etapa — solo si no está en LISTO_ENTREGA -->
+      <div th:if="${orden.estadoActual != 'LISTO_ENTREGA'}" class="col-12">
+        <div class="card p-4 mb-4"
+             style="border:1px solid var(--co-border);border-radius:10px">
+          <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+            CAMBIAR ETAPA
+          </h6>
+
+          <div class="d-flex align-items-end gap-3">
+            <div class="flex-grow-1">
+              <label class="form-label small mb-1">Mover a</label>
+              <select id="selectEtapaAdmin" class="form-select">
+                <!-- Todas las etapas excepto la actual y SIN_ASIGNAR -->
+                <option th:each="etapa : ${ {'ASIGNADO','CORTE','ENSAMBLADO',
+                                             'ACABADOS','CONTROL_CALIDAD',
+                                             'LISTO_ENTREGA'} }"
+                        th:value="${etapa}"
+                        th:text="${etapa == 'ASIGNADO' ? 'Sin iniciar' :
+                                  etapa == 'CONTROL_CALIDAD' ? 'Control de calidad' :
+                                  etapa == 'LISTO_ENTREGA' ? 'Listo para entrega' :
+                                  #strings.capitalize(#strings.toLowerCase(etapa))}"
+                        th:selected="${etapa == orden.estadoActual}"
+                        th:disabled="${etapa == orden.estadoActual}">
+                </option>
+              </select>
+            </div>
+            <button type="button"
+                    class="btn btn-primary"
+                    onclick="aplicarCambioEtapaAdmin()">
+              <i class="fa-solid fa-arrow-right me-1"></i>Aplicar
+            </button>
+          </div>
+
+          <!-- Campo de motivo — visible solo para retrocesos -->
+          <div id="contenedorMotivoDetalle" class="mt-3 d-none">
+            <label class="form-label required-label small">
+              Motivo del retroceso
+            </label>
+            <textarea id="motivoDetalleAdmin"
+                      class="form-control"
+                      rows="2"
+                      placeholder="Explica por qué retrocede esta etapa...">
+            </textarea>
+            <div class="invalid-feedback">El motivo es obligatorio</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de confirmación para LISTO_ENTREGA -->
+      <div class="modal fade" id="modalListoEntregaDetalle" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Confirmar entrega</h5>
+              <button type="button" class="btn-close"
+                      data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p>¿Confirmas que esta orden está lista para entrega?</p>
+              <p class="small text-muted">
+                Se generará la factura automáticamente y se notificará
+                al cliente por correo. Esta acción no se puede deshacer.
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"
+                      data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-success"
+                      onclick="confirmarListoEntregaDetalle()">
+                Confirmar — Listo para entrega
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Reasignar artesano -->
       <div th:if="${orden.estadoActual != 'LISTO_ENTREGA'}" class="col-12">
         <div class="card p-4" style="border:1px solid var(--co-border);border-radius:10px">
@@ -129,9 +235,97 @@
     </div>
 
     <script th:inline="javascript">
+      const ETAPAS_ORDEN = [
+          'ASIGNADO','CORTE','ENSAMBLADO',
+          'ACABADOS','CONTROL_CALIDAD','LISTO_ENTREGA'
+      ];
+      const ETAPA_ACTUAL_ADMIN = /*[[${orden.estadoActual}]]*/ '';
+      const ORDEN_ID_ADMIN     = /*[[${orden.id}]]*/ null;
+      const USUARIO_ID_ADMIN   = /*[[${session.usuarioId}]]*/ null;
+
       document.addEventListener('DOMContentLoaded', function () {
         initValidacionInline();
+
+        const selectEtapa = document.getElementById('selectEtapaAdmin');
+        if (selectEtapa) {
+          selectEtapa.addEventListener('change', function() {
+            const etapaSeleccionada = this.value;
+            const indiceActual  = ETAPAS_ORDEN.indexOf(ETAPA_ACTUAL_ADMIN);
+            const indiceDestino = ETAPAS_ORDEN.indexOf(etapaSeleccionada);
+            const esRetroceso   = indiceDestino < indiceActual;
+
+            const contenedor = document.getElementById('contenedorMotivoDetalle');
+            if (esRetroceso) {
+                contenedor.classList.remove('d-none');
+            } else {
+                contenedor.classList.add('d-none');
+                document.getElementById('motivoDetalleAdmin').value = '';
+                document.getElementById('motivoDetalleAdmin')
+                    .classList.remove('is-invalid');
+            }
+          });
+        }
       });
+
+      function aplicarCambioEtapaAdmin() {
+          const etapaDestino = document.getElementById('selectEtapaAdmin').value;
+          const indiceActual  = ETAPAS_ORDEN.indexOf(ETAPA_ACTUAL_ADMIN);
+          const indiceDestino = ETAPAS_ORDEN.indexOf(etapaDestino);
+          const esRetroceso   = indiceDestino < indiceActual;
+
+          if (etapaDestino === ETAPA_ACTUAL_ADMIN) return;
+
+          if (etapaDestino === 'LISTO_ENTREGA') {
+              // Abrir modal de confirmación
+              new bootstrap.Modal(
+                  document.getElementById('modalListoEntregaDetalle')).show();
+              return;
+          }
+
+          let motivo = null;
+          if (esRetroceso) {
+              motivo = document.getElementById('motivoDetalleAdmin').value.trim();
+              if (!motivo) {
+                  document.getElementById('motivoDetalleAdmin')
+                      .classList.add('is-invalid');
+                  return;
+              }
+          }
+
+          ejecutarCambioEtapaDetalle(etapaDestino, motivo);
+      }
+
+      async function ejecutarCambioEtapaDetalle(estadoNuevo, motivo) {
+          mostrarSpinner();
+          try {
+              const response = await fetch(
+                  `/admin/kanban/${ORDEN_ID_ADMIN}/estado`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      estadoNuevo,
+                      motivo,
+                      realizadoPor: USUARIO_ID_ADMIN
+                  })
+              });
+              if (response.ok) {
+                  window.location.reload();
+              } else {
+                  const error = await response.json();
+                  ocultarSpinner();
+                  mostrarToastError(error.mensaje || 'Error al cambiar la etapa');
+              }
+          } catch (err) {
+              ocultarSpinner();
+              mostrarToastError('Error de conexión. Intenta de nuevo.');
+          }
+      }
+
+      function confirmarListoEntregaDetalle() {
+          bootstrap.Modal.getInstance(
+              document.getElementById('modalListoEntregaDetalle')).hide();
+          ejecutarCambioEtapaDetalle('LISTO_ENTREGA', null);
+      }
     </script>
 
   </div>

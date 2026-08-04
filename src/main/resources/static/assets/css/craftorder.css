@@ -282,47 +282,79 @@ body {
     min-width: 0;
 }
 
-.kanban-board {
+/* Wrapper externo: ocupa el espacio disponible bajo el buscador */
+.kanban-wrapper {
     display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    padding-bottom: 1rem;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    width: 100%;
-    min-width: 0;
+    flex-direction: column;
+    height: calc(100vh - 220px);
+    overflow: hidden;
 }
 
+/* Fila de cabeceras de columna — sticky, no scrollea */
+.kanban-headers {
+    display: flex;
+    gap: 1rem;
+    flex-shrink: 0;
+    overflow-x: hidden; /* sincronizado con kanban-body por JS */
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--co-border);
+    margin-bottom: 0;
+}
+
+/* Cada cabecera de columna */
+.kanban-col-header {
+    flex: 0 0 240px;
+    min-width: 240px;
+    padding: 0.5rem 0.75rem;
+    background: var(--co-bg-card);
+    border-radius: 10px 10px 0 0;
+    border: 1px solid var(--co-border);
+    border-bottom: none;
+}
+
+/* Cuerpo del tablero: scrollea horizontal Y vertical */
+.kanban-body {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+}
+
+/* Cada columna: solo contenedor flex, sin scroll propio */
 .kanban-columna {
     flex: 0 0 240px;
     min-width: 240px;
-    scroll-snap-align: start;
     background: var(--co-bg-card);
-    border-radius: 10px;
+    border-radius: 0 0 10px 10px;
     padding: 0.75rem;
     border: 1px solid var(--co-border);
+    border-top: none;
+    min-height: 100%;
 }
 
-/* En móvil: columnas ocupan casi todo el ancho */
+/* En móvil */
 @media (max-width: 768px) {
+    .kanban-col-header,
     .kanban-columna {
         flex: 0 0 85vw;
         min-width: 85vw;
     }
-
-    .kanban-board {
-        padding-left: 1rem;
-        padding-right: 1rem;
+    .kanban-wrapper {
+        height: calc(100vh - 260px);
     }
 }
 
-/* Columna resaltada al arrastrar sobre ella */
+/* Columna resaltada al arrastrar */
 .kanban-drop-target {
     border: 2px dashed var(--co-primary) !important;
     background: rgba(139, 94, 60, 0.05) !important;
 }
 
-/* Tarjeta siendo arrastrada */
+/* Tarjeta — hover sutil */
 .kanban-tarjeta[draggable="true"]:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     transform: translateY(-1px);
