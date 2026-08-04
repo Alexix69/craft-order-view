@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{plantilla/base-admin}">
+
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body>
+
+  <div layout:fragment="contenidopaginas">
+
+    <h1 class="h4 fw-bold mb-4" style="color:var(--co-text-primary)">Cotizaciones</h1>
+
+    <!-- Tabs de estado -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <a class="nav-link" th:classappend="${estado == 'PENDIENTE'} ? ' active'"
+          th:href="@{/admin/cotizaciones(estado='PENDIENTE')}">
+          Pendientes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:classappend="${estado == 'APROBADA'} ? ' active'"
+          th:href="@{/admin/cotizaciones(estado='APROBADA')}">
+          Aprobadas
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:classappend="${estado == 'RECHAZADA'} ? ' active'"
+          th:href="@{/admin/cotizaciones(estado='RECHAZADA')}">
+          Rechazadas
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:classappend="${estado == 'PAGADA'} ? ' active'"
+          th:href="@{/admin/cotizaciones(estado='PAGADA')}">
+          Pagadas
+        </a>
+      </li>
+    </ul>
+
+    <!-- Tabla -->
+    <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr style="border-bottom:2px solid var(--co-border)">
+              <th style="color:var(--co-text-secondary)">Fecha</th>
+              <th style="color:var(--co-text-secondary)">Cliente</th>
+              <th style="color:var(--co-text-secondary)">Tipo de mueble</th>
+              <th style="color:var(--co-text-secondary)">Material</th>
+              <th style="color:var(--co-text-secondary)">Dimensiones</th>
+              <th style="color:var(--co-text-secondary)" th:text="${estado == 'APROBADA' or estado == 'PAGADA'} ? 
+    (${estado == 'PAGADA'} ? 'Valor pagado' : 'Costo aprobado') : 
+    'Costo estimado'">Costo estimado</th>
+              <th class="text-end" style="color:var(--co-text-secondary)">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(cotizaciones)}">
+              <td colspan="7" class="text-center py-4" style="color:var(--co-text-muted)">
+                No hay cotizaciones en este estado.
+              </td>
+            </tr>
+            <tr th:each="c : ${cotizaciones}">
+              <td th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy HH:mm')}"
+                style="color:var(--co-text-secondary)"></td>
+              <td th:text="${c.nombreCliente}" style="color:var(--co-text-primary)"></td>
+              <td th:text="${c.tipoMuebleNombre}" style="color:var(--co-text-primary)"></td>
+              <td th:text="${c.materialNombre}" style="color:var(--co-text-primary)"></td>
+              <td style="color:var(--co-text-secondary)" th:text="${c.altoCm} + '×' + ${c.anchoCm} + '×'
+                         + ${c.profundidadCm} + ' cm'"></td>
+              <td th:if="${estado == 'APROBADA' or estado == 'PAGADA'}" th:text="'$' + ${#numbers.formatDecimal(
+      c.costoAprobado != null ? c.costoAprobado : c.costoEstimado,
+      1,'COMMA',2,'POINT')}">
+              </td>
+              <td th:unless="${estado == 'APROBADA' or estado == 'PAGADA'}" th:text="'$' + ${#numbers.formatDecimal(
+      c.costoEstimado,1,'COMMA',2,'POINT')}">
+              </td>
+              <td class="text-end">
+                <a th:href="@{/admin/cotizaciones/{id}(id=${c.id})}" class="btn btn-sm btn-outline-primary">
+                  <i class="fa-solid fa-eye me-1"></i>Ver detalle
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div th:replace="~{fragmentos/paginacion :: controles(
+      ${pagina},
+      '/admin/cotizaciones',
+      ${'estado=' + estado}
+  )}"></div>
+
+  </div>
+
+</body>
+
+</html>
