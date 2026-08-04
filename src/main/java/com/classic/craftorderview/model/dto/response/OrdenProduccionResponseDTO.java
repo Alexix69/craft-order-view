@@ -19,6 +19,9 @@ public class OrdenProduccionResponseDTO {
     private BigDecimal anchoCm;
     private BigDecimal profundidadCm;
     private String nombreCliente;
+    private String correoCliente;
+    private String telefonoCliente;
+    private BigDecimal costoAprobado;
     private OffsetDateTime fechaInicio;
     private OffsetDateTime fechaFinalizacion;
     private OffsetDateTime createdAt;
