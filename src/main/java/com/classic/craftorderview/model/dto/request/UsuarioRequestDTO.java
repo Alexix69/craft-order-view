@@ -3,9 +3,9 @@ package com.classic.craftorderview.model.dto.request;
 import lombok.Data;
 
 @Data
-public class UsuarioRequestDto {
+public class UsuarioRequestDTO {
     private String nombre;
-    private String email;
-    private String passwordHash;
+    private String correo;
+    private String contrasena;
     private String rol;
 }

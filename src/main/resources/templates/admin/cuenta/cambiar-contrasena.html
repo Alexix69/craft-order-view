@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-admin}">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+<div layout:fragment="contenidopaginas">
+
+  <h4 class="fw-bold mb-4">Cambiar contraseña</h4>
+
+  <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
+
+  <div class="card" style="max-width:480px">
+    <div class="card-body p-4">
+      <form th:action="@{/admin/cambiar-contrasena}" method="post" id="formCambiarContrasenaAdmin">
+        <div class="mb-1">
+          <label for="contrasenaNueva" class="form-label">Contraseña nueva</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="contrasenaNueva"
+                   name="contrasenaNueva" required minlength="6"
+                   pattern="^(?=.*[A-Z])(?=.*\d).{6,}$"
+                   data-mensaje-error="Mínimo 6 caracteres, una mayúscula y un número">
+            <button type="button" class="btn btn-outline-secondary btn-toggle-password"
+                    data-target="#contrasenaNueva" tabindex="-1">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <div class="invalid-feedback">Mínimo 6 caracteres, una mayúscula y un número</div>
+          </div>
+        </div>
+        <p class="small mb-3 text-muted">
+          Mínimo 6 caracteres, una mayúscula y un número
+        </p>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a class="btn btn-secondary" th:href="@{/admin/dashboard}">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      initPasswordToggle();
+      initValidacionInline();
+    });
+  </script>
+
+</div>
+</body>
+</html>

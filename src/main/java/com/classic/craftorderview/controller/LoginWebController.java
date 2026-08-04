@@ -1,8 +1,8 @@
 package com.classic.craftorderview.controller;
 
 import com.classic.craftorderview.model.dto.request.LoginRequestDTO;
-import com.classic.craftorderview.model.dto.response.UsuarioResponseDto;
-import com.classic.craftorderview.services.IUsuarioService;
+import com.classic.craftorderview.model.dto.response.UsuarioResponseDTO;
+import com.classic.craftorderview.services.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,14 +13,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class LoginWebController {
 
-    private final IUsuarioService usuarioService;
+    private final UsuarioApiService usuarioService;
 
-    public LoginWebController(IUsuarioService usuarioService) {
+    public LoginWebController(UsuarioApiService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
     @GetMapping("/login")
-    public String mostrarLogin(Model model) {
+    public String mostrarLogin(Model model, HttpSession session) {
+        String rol = (String) session.getAttribute("usuarioRol");
+        if ("ADMIN".equals(rol)) {
+            return "redirect:/admin/dashboard";
+        }
+        if ("ARTESANO".equals(rol)) {
+            return "redirect:/artesano/tablero";
+        }
+
         model.addAttribute("error", null);
         return "plantilla/login";
     }
@@ -30,10 +38,15 @@ public class LoginWebController {
                                 HttpSession session,
                                 Model model) {
         try {
-            UsuarioResponseDto usuario = usuarioService.autenticar(dto);
+            UsuarioResponseDTO usuario = usuarioService.autenticar(dto);
             session.setAttribute("usuarioId", usuario.getId());
             session.setAttribute("usuarioNombre", usuario.getNombre());
             session.setAttribute("usuarioRol", usuario.getRol());
+
+            if (Boolean.TRUE.equals(usuario.getPrimerLogin())) {
+                session.setAttribute("primerLogin", true);
+                return "redirect:/cambiar-contrasena";
+            }
 
             if ("ADMIN".equals(usuario.getRol())) {
                 return "redirect:/admin/dashboard";
@@ -45,9 +58,14 @@ public class LoginWebController {
                 return "plantilla/login";
             }
         } catch (Exception e) {
-            model.addAttribute("error",
-                "Credenciales incorrectas. Intente nuevamente.");
+            model.addAttribute("error", e.getMessage());
             return "plantilla/login";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
     }
 }
