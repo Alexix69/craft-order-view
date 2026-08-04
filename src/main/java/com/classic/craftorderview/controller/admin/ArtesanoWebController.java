@@ -60,6 +60,12 @@ public class ArtesanoWebController {
             session.removeAttribute("artesanoReseteado");
         }
 
+        Object errorArtesano = session.getAttribute("errorArtesano");
+        if (errorArtesano != null) {
+            model.addAttribute(ModelAtributos.ERROR, errorArtesano);
+            session.removeAttribute("errorArtesano");
+        }
+
         return Vistas.ADMIN_ARTESANOS;
     }
 
@@ -96,7 +102,11 @@ public class ArtesanoWebController {
             return redireccion;
         }
 
-        usuarioService.desactivar(id);
+        try {
+            usuarioService.desactivar(id);
+        } catch (Exception e) {
+            session.setAttribute("errorArtesano", e.getMessage());
+        }
         return "redirect:/admin/artesanos";
     }
 

@@ -29,8 +29,19 @@
             <span th:case="'RECHAZADA'" class="badge bg-danger fs-6 px-3 py-2">
               Rechazada
             </span>
-            <span th:case="'PAGADA'" class="badge bg-success fs-6 px-3 py-2">
-              Pago recibido — asignando artesano
+            <span th:case="'PAGADA'">
+              <span th:if="${cotizacion.estadoOrden == null}"
+                    class="badge bg-success fs-6 px-3 py-2">
+                Pago recibido — asignando artesano
+              </span>
+              <span th:unless="${cotizacion.estadoOrden == null}"
+                    class="badge bg-primary fs-6 px-3 py-2"
+                    th:text="${cotizacion.estadoOrden == 'ASIGNADO' ?
+                              'Artesano asignado — por iniciar' :
+                              cotizacion.estadoOrden == 'LISTO_ENTREGA' ?
+                              'Listo para entrega' :
+                              'En producción — ' + cotizacion.estadoOrden}">
+              </span>
             </span>
           </span>
         </div>
@@ -67,12 +78,31 @@
           <span th:text="${cotizacion.motivoRechazo}"></span>
         </div>
 
-        <!-- Info: pago recibido, pendiente de asignación de artesano -->
+        <!-- Mensaje informativo para PAGADA -->
         <div th:if="${cotizacion.estado == 'PAGADA'}" class="alert alert-info mb-4">
           <i class="fa-solid fa-clock-rotate-left me-2"></i>
-          Hemos recibido tu pago. Nuestro equipo está asignando un artesano
-          para comenzar la fabricación de tu mueble. Te notificaremos por correo
-          cuando inicie la producción.
+          <!-- Sin orden asignada aún -->
+          <span th:if="${cotizacion.estadoOrden == null}">
+            Hemos recibido tu pago. Nuestro equipo está asignando un artesano
+            para comenzar la fabricación de tu mueble.
+            Te notificaremos por correo cuando inicie la producción.
+          </span>
+          <!-- Orden asignada, aún no inició -->
+          <span th:if="${cotizacion.estadoOrden == 'ASIGNADO'}">
+            Tu pedido tiene un artesano asignado y comenzará a fabricarse pronto.
+            Te notificaremos por correo cuando inicie la producción.
+          </span>
+          <!-- En producción -->
+          <span th:if="${cotizacion.estadoOrden != null
+                         and cotizacion.estadoOrden != 'ASIGNADO'
+                         and cotizacion.estadoOrden != 'LISTO_ENTREGA'}">
+            Tu mueble está siendo fabricado. Puedes ver el avance detallado
+            en el historial de tu pedido más abajo.
+          </span>
+          <!-- Listo para entrega -->
+          <span th:if="${cotizacion.estadoOrden == 'LISTO_ENTREGA'}">
+            ¡Tu mueble está listo! Acércate a nuestro taller para retirarlo.
+          </span>
         </div>
 
         <!-- Acción según estado -->
@@ -84,6 +114,41 @@
           <a th:href="@{/catalogo}" class="btn btn-outline-secondary ms-2">
             <i class="fa-solid fa-arrow-left me-1"></i>Volver al catálogo
           </a>
+        </div>
+
+        <!-- Línea de tiempo de producción -->
+        <div th:if="${cotizacion.historialOrden != null
+                     and !cotizacion.historialOrden.isEmpty()}"
+             class="card p-4 mt-4"
+             style="border:1px solid var(--co-border);border-radius:10px">
+          <h6 class="fw-semibold mb-3" style="color:var(--co-text-secondary)">
+            HISTORIAL DE TU PEDIDO
+          </h6>
+          <div th:each="evento : ${cotizacion.historialOrden}"
+               class="d-flex gap-3 mb-3">
+            <div>
+              <span th:if="${evento.motivo != null}"
+                    class="text-warning fs-5">⚠️</span>
+              <span th:unless="${evento.motivo != null}"
+                    class="text-success fs-5">✅</span>
+            </div>
+            <div>
+              <p class="mb-0 small fw-semibold"
+                 th:text="${evento.valorAnterior != null ?
+                           evento.valorAnterior + ' → ' + evento.valorNuevo :
+                           evento.valorNuevo}">
+              </p>
+              <p class="mb-0 small text-muted"
+                 th:text="${#temporals.format(evento.createdAt,
+                           'dd/MM/yyyy HH:mm')}">
+              </p>
+              <p th:if="${evento.motivo != null}"
+                 class="mb-0 small fst-italic"
+                 style="color:var(--co-text-muted)"
+                 th:text="'💬 ' + ${evento.motivo}">
+              </p>
+            </div>
+          </div>
         </div>
 
       </div>
