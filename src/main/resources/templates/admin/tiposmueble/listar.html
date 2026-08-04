@@ -1,0 +1,213 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-admin}">
+
+<div layout:fragment="contenido">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 fw-bold mb-0"
+        style="color:var(--co-text-primary)">Gestión de Tipos de Mueble</h1>
+    <button type="button" class="btn btn-primary"
+            data-bs-toggle="modal" data-bs-target="#modalCrearTipo">
+      <i class="fa-solid fa-plus me-1"></i>
+      Nuevo Tipo de Mueble
+    </button>
+  </div>
+
+  <div th:if="${errorConexion}"
+       class="alert alert-warning"
+       th:text="${errorConexion}"></div>
+
+  <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr style="border-bottom:2px solid var(--co-border)">
+            <th style="color:var(--co-text-secondary)">Imagen</th>
+            <th style="color:var(--co-text-secondary)">Nombre</th>
+            <th style="color:var(--co-text-secondary)">Descripción</th>
+            <th style="color:var(--co-text-secondary)">Costo M.O.</th>
+            <th style="color:var(--co-text-secondary)">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(tiposMueble)}">
+            <td colspan="5" class="text-center py-4"
+                style="color:var(--co-text-muted)">
+              No hay tipos de mueble registrados.
+            </td>
+          </tr>
+          <tr th:each="tipo : ${tiposMueble}">
+            <td>
+              <img th:if="${tipo.fotoUrl != null and !tipo.fotoUrl.isEmpty()}"
+                   th:src="${tipo.fotoUrl}"
+                   style="width:48px;height:48px;object-fit:cover;border-radius:6px"/>
+              <i th:unless="${tipo.fotoUrl != null and !tipo.fotoUrl.isEmpty()}"
+                 class="fa-solid fa-couch fa-lg"
+                 style="color:var(--co-text-muted)"></i>
+            </td>
+            <td th:text="${tipo.nombre}"
+                style="color:var(--co-text-primary)"></td>
+            <td th:text="${tipo.descripcion}"
+                style="color:var(--co-text-secondary)"></td>
+            <td th:text="${#numbers.formatDecimal(tipo.costoBaseMo,1,'COMMA',2,'POINT')}"
+                style="color:var(--co-text-secondary)"></td>
+            <td>
+              <form th:action="@{/admin/tiposmueble/{id}/desactivar(id=${tipo.id})}"
+                    method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-danger"
+                        onclick="return confirm('¿Desactivar este tipo de mueble?')">
+                  Desactivar
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de creación -->
+  <div class="modal fade" id="modalCrearTipo" tabindex="-1"
+       aria-labelledby="modalCrearTipoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCrearTipoLabel">Nuevo Tipo de Mueble</h5>
+          <button type="button" class="btn-close"
+                  data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form th:action="@{/admin/tiposmueble}" method="post">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre"
+                     name="nombre" required>
+            </div>
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion"
+                        name="descripcion" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="costoBaseMo" class="form-label">Costo M.O.</label>
+              <input type="number" class="form-control" id="costoBaseMo"
+                     name="costoBaseMo" step="0.01" min="0" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Imagen</label>
+
+              <p class="small mb-2" style="color:var(--co-text-secondary)">
+                Seleccionar de galería
+              </p>
+              <div class="row row-cols-3 g-2 mb-3" id="galeriaImagenes">
+                <div class="col">
+                  <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400"
+                       data-url="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400"
+                       class="img-thumbnail miniatura-galeria"
+                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
+                </div>
+                <div class="col">
+                  <img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400"
+                       data-url="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400"
+                       class="img-thumbnail miniatura-galeria"
+                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
+                </div>
+                <div class="col">
+                  <img src="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=400"
+                       data-url="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=400"
+                       class="img-thumbnail miniatura-galeria"
+                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
+                </div>
+                <div class="col">
+                  <img src="https://images.unsplash.com/photo-1551298370-9d3d53740c72?w=400"
+                       data-url="https://images.unsplash.com/photo-1551298370-9d3d53740c72?w=400"
+                       class="img-thumbnail miniatura-galeria"
+                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
+                </div>
+                <div class="col">
+                  <img src="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=400"
+                       data-url="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=400"
+                       class="img-thumbnail miniatura-galeria"
+                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
+                </div>
+                <div class="col">
+                  <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400"
+                       data-url="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400"
+                       class="img-thumbnail miniatura-galeria"
+                       style="width:80px;height:80px;object-fit:cover;cursor:pointer"/>
+                </div>
+              </div>
+
+              <p class="small mb-2" style="color:var(--co-text-secondary)">
+                Subir imagen propia
+              </p>
+              <input type="file" class="form-control" id="archivoImagen" accept="image/*">
+
+              <input type="hidden" id="fotoUrl" name="fotoUrl">
+
+              <img id="previewImagen" alt="Vista previa"
+                   style="display:none;width:100%;max-height:120px;
+                          object-fit:cover;border-radius:8px;margin-top:8px"/>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var miniaturas = document.querySelectorAll('.miniatura-galeria');
+      var inputArchivo = document.getElementById('archivoImagen');
+      var campoFotoUrl = document.getElementById('fotoUrl');
+      var preview = document.getElementById('previewImagen');
+
+      function marcarSeleccion(el) {
+        miniaturas.forEach(function (m) {
+          m.style.borderColor = 'var(--co-border)';
+          m.classList.remove('border-primary');
+        });
+        if (el) {
+          el.style.borderColor = 'var(--co-primary)';
+          el.classList.add('border-primary');
+        }
+      }
+
+      function mostrarPreview(url) {
+        preview.src = url;
+        preview.style.display = 'block';
+      }
+
+      miniaturas.forEach(function (img) {
+        img.addEventListener('click', function () {
+          var url = img.getAttribute('data-url');
+          campoFotoUrl.value = url;
+          marcarSeleccion(img);
+          mostrarPreview(url);
+          inputArchivo.value = '';
+        });
+      });
+
+      inputArchivo.addEventListener('change', function () {
+        var archivo = inputArchivo.files && inputArchivo.files[0];
+        if (!archivo) return;
+        var lector = new FileReader();
+        lector.onload = function (e) {
+          campoFotoUrl.value = e.target.result;
+          marcarSeleccion(null);
+          mostrarPreview(e.target.result);
+        };
+        lector.readAsDataURL(archivo);
+      });
+    })();
+  </script>
+
+</div>
+</html>

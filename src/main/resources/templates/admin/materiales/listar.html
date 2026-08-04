@@ -1,0 +1,206 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{plantilla/base-admin}">
+
+<div layout:fragment="contenido">
+
+  <!-- Sección 1: Materiales -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 fw-bold mb-0"
+        style="color:var(--co-text-primary)">Materiales de Construcción</h2>
+    <button type="button" class="btn btn-primary"
+            data-bs-toggle="modal" data-bs-target="#modalCrearMaterial">
+      <i class="fa-solid fa-plus me-1"></i>
+      Nuevo Material
+    </button>
+  </div>
+
+  <div th:if="${errorConexion}"
+       class="alert alert-warning"
+       th:text="${errorConexion}"></div>
+
+  <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr style="border-bottom:2px solid var(--co-border)">
+            <th style="color:var(--co-text-secondary)">Nombre</th>
+            <th style="color:var(--co-text-secondary)">Precio por m³</th>
+            <th style="color:var(--co-text-secondary)">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(materiales)}">
+            <td colspan="3" class="text-center py-4"
+                style="color:var(--co-text-muted)">
+              No hay materiales registrados.
+            </td>
+          </tr>
+          <tr th:each="material : ${materiales}">
+            <td th:text="${material.nombre}"
+                style="color:var(--co-text-primary)"></td>
+            <td th:text="${#numbers.formatDecimal(material.precioPorM3,1,'COMMA',2,'POINT')} + ' $/m³'"
+                style="color:var(--co-text-secondary)"></td>
+            <td>
+              <form th:action="@{/admin/materiales/{id}/desactivar(id=${material.id})}"
+                    method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-danger"
+                        onclick="return confirm('¿Desactivar este material?')">
+                  Desactivar
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de creación de material -->
+  <div class="modal fade" id="modalCrearMaterial" tabindex="-1"
+       aria-labelledby="modalCrearMaterialLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCrearMaterialLabel">Nuevo Material</h5>
+          <button type="button" class="btn-close"
+                  data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form th:action="@{/admin/materiales}" method="post">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre"
+                     name="nombre" required>
+            </div>
+            <div class="mb-3">
+              <label for="precioPorM3" class="form-label">Precio por m³</label>
+              <input type="number" class="form-control" id="precioPorM3"
+                     name="precioPorM3" step="0.01" min="0" required>
+              <div class="form-text">
+                Ingrese el precio en unidades enteras. Ejemplo: 850 equivale
+                a $850 por metro cúbico.
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <hr style="border-color:var(--co-border);margin:2rem 0">
+
+  <!-- Sección 2: Tipos de Acabado -->
+  <h2 class="h4 fw-bold mb-1"
+      style="color:var(--co-text-primary)">Tipos de Acabado</h2>
+  <p class="small mb-3" style="color:var(--co-text-secondary)">
+    Los tipos de acabado son fijos del sistema (LACA, PINTURA, NATURAL).
+    Solo puede modificarse el porcentaje de costo que aplica cada uno.
+  </p>
+
+  <div class="card" style="border:1px solid var(--co-border);border-radius:10px">
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr style="border-bottom:2px solid var(--co-border)">
+            <th style="color:var(--co-text-secondary)">Acabado</th>
+            <th style="color:var(--co-text-secondary)">Porcentaje</th>
+            <th style="color:var(--co-text-secondary)">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Fallback: el back aún no expone /api/materiales/acabados -->
+          <th:block th:if="${#lists.isEmpty(acabados)}">
+            <tr th:each="tipoFijo : ${tiposAcabadoDefault}" class="fila-vista" th:id="|vista-${tipoFijo}|">
+              <td th:text="${tipoFijo}" style="color:var(--co-text-primary)"></td>
+              <td><span class="valor-porcentaje" style="color:var(--co-text-secondary)">--</span></td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-primary btn-editar-acabado" th:attr="data-tipo=${tipoFijo}">Editar</button>
+              </td>
+            </tr>
+            <tr th:each="tipoFijo : ${tiposAcabadoDefault}" class="fila-edicion" style="display:none" th:id="|edicion-${tipoFijo}|">
+              <td th:text="${tipoFijo}" style="color:var(--co-text-primary)"></td>
+              <td>
+                <form th:action="@{/admin/materiales/acabados/{tipo}/porcentaje(tipo=${tipoFijo})}" method="post" class="d-flex align-items-center gap-2">
+                  <input type="number" class="form-control form-control-sm" name="porcentaje" min="0" max="100" step="1" style="width:80px">
+                  <span style="color:var(--co-text-secondary)">%</span>
+                  <button type="submit" class="btn btn-sm btn-primary">Guardar</button>
+                  <button type="button" class="btn btn-sm btn-secondary btn-cancelar-acabado" th:attr="data-tipo=${tipoFijo}">Cancelar</button>
+                </form>
+              </td>
+              <td></td>
+            </tr>
+          </th:block>
+
+          <!-- Datos reales del back -->
+          <th:block th:unless="${#lists.isEmpty(acabados)}">
+            <tr th:each="acabado : ${acabados}" class="fila-vista" th:id="|vista-${acabado.tipo}|">
+              <td th:text="${acabado.tipo}" style="color:var(--co-text-primary)"></td>
+              <td>
+                <span class="valor-porcentaje" th:text="${acabado.porcentaje + '%'}" style="color:var(--co-text-secondary)">--</span>
+              </td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-primary btn-editar-acabado" th:attr="data-tipo=${acabado.tipo}">Editar</button>
+              </td>
+            </tr>
+            <tr th:each="acabado : ${acabados}" class="fila-edicion" style="display:none" th:id="|edicion-${acabado.tipo}|">
+              <td th:text="${acabado.tipo}" style="color:var(--co-text-primary)"></td>
+              <td>
+                <form th:action="@{/admin/materiales/acabados/{tipo}/porcentaje(tipo=${acabado.tipo})}" method="post" class="d-flex align-items-center gap-2">
+                  <input type="number" class="form-control form-control-sm" name="porcentaje" min="0" max="100" step="1" style="width:80px" th:value="${acabado.porcentaje}">
+                  <span style="color:var(--co-text-secondary)">%</span>
+                  <button type="submit" class="btn btn-sm btn-primary">Guardar</button>
+                  <button type="button" class="btn btn-sm btn-secondary btn-cancelar-acabado" th:attr="data-tipo=${acabado.tipo}">Cancelar</button>
+                </form>
+              </td>
+              <td></td>
+            </tr>
+          </th:block>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      function cerrarTodasLasEdiciones() {
+        document.querySelectorAll('.fila-edicion').forEach(function (tr) {
+          tr.style.display = 'none';
+        });
+        document.querySelectorAll('.fila-vista').forEach(function (tr) {
+          tr.style.display = '';
+        });
+      }
+
+      document.querySelectorAll('.btn-editar-acabado').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tipo = btn.getAttribute('data-tipo');
+          cerrarTodasLasEdiciones();
+          var vista = document.getElementById('vista-' + tipo);
+          var edicion = document.getElementById('edicion-' + tipo);
+          if (vista) vista.style.display = 'none';
+          if (edicion) edicion.style.display = '';
+        });
+      });
+
+      document.querySelectorAll('.btn-cancelar-acabado').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tipo = btn.getAttribute('data-tipo');
+          var vista = document.getElementById('vista-' + tipo);
+          var edicion = document.getElementById('edicion-' + tipo);
+          if (edicion) edicion.style.display = 'none';
+          if (vista) vista.style.display = '';
+        });
+      });
+    })();
+  </script>
+
+</div>
+</html>
