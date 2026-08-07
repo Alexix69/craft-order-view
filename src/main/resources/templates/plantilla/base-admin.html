@@ -45,12 +45,6 @@
 
     <ul class="nav flex-column gap-1">
       <li class="nav-item">
-        <a class="nav-link" th:href="@{/admin/dashboard}"
-           th:classappend="${seccionActiva != null and #strings.startsWith(seccionActiva, '/admin/dashboard')} ? 'active' : ''">
-          <i class="bi bi-speedometer2"></i>Dashboard
-        </a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" th:href="@{/admin/artesanos}"
            th:classappend="${seccionActiva != null and #strings.startsWith(seccionActiva, '/admin/artesanos')} ? 'active' : ''">
           <i class="bi bi-people"></i>Artesanos
@@ -148,7 +142,7 @@
     <!-- Footer -->
     <footer class="text-center py-3 border-top"
             style="color:var(--co-text-secondary)">
-      <small>craftorderview — Classic Mueblería</small>
+      <small>Classic Mueblería</small>
     </footer>
   </div>
 </div>

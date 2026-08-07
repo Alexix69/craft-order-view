@@ -9,7 +9,6 @@ public final class ModelAtributos {
     public static final String TITULO_PAGINA = "tituloPagina";
     public static final String ERROR_MODAL = "errorModal";
     public static final String ABRIR_MODAL = "abrirModal";
-    public static final String MENSAJE_EXITO = "mensajeExito";
     public static final String PAGINA = "pagina";
     public static final String NOMBRE_FILTRO = "nombre";
     public static final String COTIZACION = "cotizacion";
