@@ -44,8 +44,7 @@ public class AdminCambiarContrasenaWebController {
         try {
             Long usuarioId = (Long) session.getAttribute(ModelAtributos.SESSION_USUARIO_ID);
             usuarioService.cambiarContrasena(usuarioId, dto);
-            session.setAttribute(ModelAtributos.MENSAJE_EXITO, "Contraseña actualizada correctamente");
-            return "redirect:/admin/dashboard";
+            return "redirect:/admin/kanban";
         } catch (Exception e) {
             model.addAttribute(ModelAtributos.TITULO_PAGINA, "Cambiar contraseña");
             model.addAttribute("error", e.getMessage());
@@ -61,7 +60,7 @@ public class AdminCambiarContrasenaWebController {
         if (!rolRequerido.equals(rol)) {
             return "ARTESANO".equals(rol)
                     ? "redirect:/artesano/tablero"
-                    : "redirect:/admin/dashboard";
+                    : "redirect:/admin/kanban";
         }
         return null;
     }

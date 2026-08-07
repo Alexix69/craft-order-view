@@ -25,7 +25,7 @@ public class LoginWebController {
     public String mostrarLogin(Model model, HttpSession session) {
         String rol = (String) session.getAttribute(ModelAtributos.SESSION_USUARIO_ROL);
         if ("ADMIN".equals(rol)) {
-            return "redirect:/admin/dashboard";
+            return "redirect:/admin/kanban";
         }
         if ("ARTESANO".equals(rol)) {
             return "redirect:/artesano/tablero";
@@ -51,7 +51,7 @@ public class LoginWebController {
             }
 
             if ("ADMIN".equals(usuario.getRol())) {
-                return "redirect:/admin/dashboard";
+                return "redirect:/admin/kanban";
             } else if ("ARTESANO".equals(usuario.getRol())) {
                 return "redirect:/artesano/tablero";
             } else {

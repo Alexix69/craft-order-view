@@ -28,7 +28,7 @@ public class CambiarContrasenaWebController {
         }
 
         if (!Boolean.TRUE.equals(session.getAttribute(ModelAtributos.SESSION_PRIMER_LOGIN))) {
-            return "ARTESANO".equals(rol) ? "redirect:/artesano/tablero" : "redirect:/admin/dashboard";
+            return "ARTESANO".equals(rol) ? "redirect:/artesano/tablero" : "redirect:/admin/kanban";
         }
 
         return Vistas.CAMBIAR_CONTRASENA;
@@ -47,7 +47,7 @@ public class CambiarContrasenaWebController {
             Long usuarioId = (Long) session.getAttribute(ModelAtributos.SESSION_USUARIO_ID);
             usuarioService.cambiarContrasena(usuarioId, dto);
             session.removeAttribute(ModelAtributos.SESSION_PRIMER_LOGIN);
-            return "ARTESANO".equals(rol) ? "redirect:/artesano/tablero" : "redirect:/admin/dashboard";
+            return "ARTESANO".equals(rol) ? "redirect:/artesano/tablero" : "redirect:/admin/kanban";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             return Vistas.CAMBIAR_CONTRASENA;

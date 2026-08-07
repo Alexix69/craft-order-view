@@ -17,7 +17,6 @@ public final class Vistas {
     public static final String ERROR = "error";
 
     // Admin
-    public static final String ADMIN_DASHBOARD = "admin/dashboard/dashboard";
     public static final String ADMIN_ARTESANOS = "admin/artesanos/listar";
     public static final String ADMIN_TIPOSMUEBLE = "admin/tiposmueble/listar";
     public static final String ADMIN_MATERIALES = "admin/materiales/listar";
