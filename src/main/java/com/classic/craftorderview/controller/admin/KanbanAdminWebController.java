@@ -148,7 +148,7 @@ public class KanbanAdminWebController {
         if (!rolRequerido.equals(rol)) {
             return "ARTESANO".equals(rol)
                     ? "redirect:/artesano/kanban"
-                    : "redirect:/admin/dashboard";
+                    : "redirect:/admin/kanban";
         }
         return null;
     }

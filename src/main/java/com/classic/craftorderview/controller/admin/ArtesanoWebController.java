@@ -144,7 +144,7 @@ public class ArtesanoWebController {
         if (!rolRequerido.equals(rol)) {
             return "ARTESANO".equals(rol)
                     ? "redirect:/artesano/tablero"
-                    : "redirect:/admin/dashboard";
+                    : "redirect:/admin/kanban";
         }
         return null;
     }
