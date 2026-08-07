@@ -80,5 +80,5 @@ La aplicación queda disponible en: `http://localhost:8091`
 
 | Servicio | Puerto |
 |---|---|
-| Frontend | 8091 (por defecto) |
+| Frontend | 8081 (por defecto) |
 | Backend API requerido | 8080 |
